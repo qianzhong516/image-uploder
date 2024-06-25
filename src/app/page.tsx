@@ -1,4 +1,4 @@
-import Button from '@/components/button';
+import Button from '@/components/button/button';
 import DeleteBin from '@/components/icons/delete-bin';
 
 export default function Home() {

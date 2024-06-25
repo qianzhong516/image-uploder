@@ -7,6 +7,7 @@ type ButtonProps = {
     disabled?: boolean;
     className?: string;
     children: React.ReactNode;
+    onClick?: () => void;
 }
 
 export default function Button({ theme, disabled = false, prefixIcon, suffixIcon, className, children }: ButtonProps) {
