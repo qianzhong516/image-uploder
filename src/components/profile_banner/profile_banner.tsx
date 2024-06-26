@@ -36,7 +36,7 @@ export default function profileBanner({
     return (
         <div className={clsx('shadow-md', className)}>
             <div className="relative bg-[url('/cover.png')] bg-no-repeat bg-cover bg-center">
-                <ProfileIcon state={'uploaded'} size={100} src={profileIconSrc} className='absolute left-4 bottom-0 translate-y-1/2 border-4 border-white rounded-full' />
+                <ProfileIcon size={100} src={profileIconSrc} className='absolute left-4 bottom-0 translate-y-1/2 border-4 border-white rounded-full' />
             </div>
 
             <div className='flex flex-col gap-4 p-4'>

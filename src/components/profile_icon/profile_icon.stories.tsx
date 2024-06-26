@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>;
 
 export const EmptyState: Story = {
     args: {
-        state: 'initial',
+        isEmpty: true,
         size: 100
     },
 };
@@ -25,8 +25,8 @@ export const EmptyState: Story = {
 
 export const UploadingState: Story = {
     args: {
-        state: 'uploading',
         src: '/avatar-john.png',
+        isUploading: true,
         size: 100
     },
 };
