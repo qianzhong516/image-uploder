@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import Button from './button';
 import DeleteBin from '@/components/icons/delete-bin'
+import UploadCloud from '@/components/icons/upload-cloud'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -41,3 +42,10 @@ export const tertiary: Story = {
         prefixIcon: <DeleteBin size='sm' />
     },
 };
+
+export const iconOnly: Story = {
+    args: {
+        theme: 'tertiary',
+        children: <UploadCloud size='sm' />
+    },
+}

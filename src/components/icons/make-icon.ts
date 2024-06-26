@@ -7,15 +7,16 @@ type IconProps = {
 };
 
 export const makeIcon = (IconComponent: React.FC<SVGProps>) => {
-  return ({ size = 'md' }: IconProps) => {
+  // returns a higher order component that defines icon size
+  return ({ size = 'sm' }: IconProps) => {
     const actualSize =
       size === 'sm'
         ? 20
         : size === 'md'
-        ? 40
-        : size === 'lg'
-        ? 80
-        : size;
+          ? 40
+          : size === 'lg'
+            ? 80
+            : size;
     return IconComponent({
       size: actualSize,
     });
