@@ -21,7 +21,7 @@ export default function Modal({
     className,
     onClose,
 }: ModalProps) {
-    const buttonStyles = 'text-sm px-0 py-0';
+    const buttonStyles = 'text-sm px-0 py-0 w-full';
 
     return (
         <div className={twMerge('flex flex-col gap-6 p-4 shadow-md', className)}>

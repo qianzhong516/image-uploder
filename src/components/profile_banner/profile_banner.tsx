@@ -35,13 +35,13 @@ export default function profileBanner({
 }: ProfileBannerProps) {
     return (
         <div className={twMerge('shadow-md', className)}>
-            <div className="relative bg-[url('/cover.png')] bg-no-repeat bg-cover bg-center">
+            <div className="relative bg-[url('/cover.png')] bg-no-repeat bg-cover bg-center min-h-[120px]">
                 <ProfileIcon size={100} src={profileIconSrc} className='absolute left-4 bottom-0 translate-y-1/2 border-4 border-white rounded-full' />
             </div>
 
             <div className='flex flex-col gap-4 p-4'>
                 <div className='flex justify-end'>
-                    <Button theme='secondary' onClick={onUpdatePicture} className='text-xs p-2'>Update Picture</Button>
+                    <Button theme='secondary' onClick={onUpdatePicture} className='text-xs w-full max-w-[150px]'>Update Picture</Button>
                 </div>
                 <div className='flex flex-col gap-2'>
                     <h2 className='text-xl'>{name}</h2>
