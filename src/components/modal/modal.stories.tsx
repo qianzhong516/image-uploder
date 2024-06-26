@@ -22,7 +22,7 @@ export const View: Story = {
     args: {
         title: 'Upload image(s)',
         subtitle: 'You may upload up to 5 images',
-        children: <div className='bg-[#ccc] w-full h-[300px] p-2'>Modal Content</div>,
+        children: <div className='bg-[#E5E5E5] w-full h-[300px] p-2'>Modal Content</div>,
         className: 'min-w-[600px]',
         leftButton: ({ className }) => <Button theme='secondary' className={className}>Cancel</Button>,
         rightButton: ({ className }) => <Button theme='secondary' className={className} disabled>Select Image</Button>

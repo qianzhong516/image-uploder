@@ -1,6 +1,6 @@
 import ProfileIcon from '@/components/profile_icon/profile_icon';
 import Button from '@/components/button/button';
-import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 const NATION_FLAGS = {
     'Canada': '🇨🇦',
@@ -34,7 +34,7 @@ export default function profileBanner({
     onUpdatePicture
 }: ProfileBannerProps) {
     return (
-        <div className={clsx('shadow-md', className)}>
+        <div className={twMerge('shadow-md', className)}>
             <div className="relative bg-[url('/cover.png')] bg-no-repeat bg-cover bg-center">
                 <ProfileIcon size={100} src={profileIconSrc} className='absolute left-4 bottom-0 translate-y-1/2 border-4 border-white rounded-full' />
             </div>

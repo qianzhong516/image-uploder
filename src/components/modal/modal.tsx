@@ -1,6 +1,6 @@
 import Button from '@/components/button/button';
 import CloseIcon from '@/components/icons/close';
-import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 type ModalProps = {
     title: string,
@@ -24,7 +24,7 @@ export default function Modal({
     const buttonStyles = 'text-sm px-0 py-0';
 
     return (
-        <div className={clsx('flex flex-col gap-6 p-4 shadow-md', className)}>
+        <div className={twMerge('flex flex-col gap-6 p-4 shadow-md', className)}>
             <div className='flex justify-between w-full'>
                 <div className='flex flex-col gap'>
                     <h1 className="text-lg">{title}</h1>
