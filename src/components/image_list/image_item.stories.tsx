@@ -11,7 +11,6 @@ const meta = {
     args: {
         title: 'IMG_0083.jpg',
         totalSize: '331kb',
-        imgSrc: '/avatar-image-item.png'
     },
 } satisfies Meta<typeof ImageItem>;
 
@@ -21,7 +20,8 @@ type Story = StoryObj<typeof meta>;
 
 export const InitialState: Story = {
     args: {
-        state: 'loaded',
+        state: 'complete',
+        imgSrc: '/avatar-image-item.png',
         onCropImage: fn(),
         onDelete: fn()
     },
@@ -30,8 +30,25 @@ export const InitialState: Story = {
 export const LoadingState: Story = {
     args: {
         state: 'loading',
+        imgSrc: '/avatar-image-item.png',
         progress: 44,
         onCancelUpload: fn()
+    },
+};
+
+export const LoadSuccessState: Story = {
+    args: {
+        state: 'load-success',
+        imgSrc: '/avatar-image-item.png',
+        onDelete: fn()
+    },
+};
+
+export const ErrorState: Story = {
+    args: {
+        state: 'error',
+        onDelete: fn(),
+        error: 'This image is larger than 5MB. Please select a smaller image.'
     },
 };
 
