@@ -30,7 +30,7 @@ export const InitialState: Story = {
 export const LoadingState: Story = {
     args: {
         state: 'loading',
-        progress: 34,
+        progress: 44,
         onCancelUpload: fn()
     },
 };

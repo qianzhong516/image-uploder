@@ -40,7 +40,7 @@ const ImageItemWrapper = ({
                 <ProfileIcon src={imgSrc} size={80} className='rounded-md' />
                 <div className='flex flex-col justify-between'>
                     <div className='flex justify-between items-start'>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap">
                             <h2 className="text-base fonts-semibold">{title}</h2>
                             <p className="text-xs text-neutral-600">{totalSize}</p>
                         </div>
@@ -78,7 +78,7 @@ export default function ImageItem({
                 bottomControl={bottomControl} />;
 
         } case 'loading': {
-            const rightControl = <Button theme='tertiary' onClick={props.onCancelUpload} className='items-start'><CloseIcon /></Button>
+            const rightControl = <Button theme='tertiary' onClick={props.onCancelUpload} className='items-start max-h-[44px]'><CloseIcon /></Button>
             const bottomControl = undefined;
 
             return <ImageItemWrapper
