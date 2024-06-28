@@ -8,24 +8,16 @@ const meta = {
         layout: 'centered',
     },
     tags: ['autodocs'],
-    args: {
-        value: '',
-    },
 } satisfies Meta<typeof RadioButton>;
 
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const InitialState: Story = {
+export const View: Story = {
     args: {
         name: 'radio-btn-1',
+        value: '',
+        size: 32
     },
 };
-
-export const SelectedState: Story = {
-    args: {
-        name: 'radio-btn-2',
-    },
-};
-
