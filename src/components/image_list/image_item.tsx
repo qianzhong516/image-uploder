@@ -18,7 +18,7 @@ type ImageItemWrapperProps = ImageItemCommonProps & {
 }
 
 type ImageItemProps = ImageItemCommonProps & ({
-    state: 'initial',
+    state: 'loaded',
     onCropImage: () => void,
     onDelete: () => void
 } | {
@@ -62,7 +62,7 @@ export default function ImageItem({
 }: ImageItemProps) {
 
     switch (props.state) {
-        case 'initial': {
+        case 'loaded': {
             const rightControl = <RadioButton name='image-item' value={title} />;
             const bottomControl = <div className='flex gap-1 items-center'>
                 <Button theme='tertiary' prefixIcon={<CropIcon />} className='text-sm' onClick={props.onCropImage}>Crop image</Button> <span className='text-neutral-600 font-bold'>&sdot;</span>
