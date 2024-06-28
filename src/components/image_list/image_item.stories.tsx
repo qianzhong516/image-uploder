@@ -21,7 +21,9 @@ type Story = StoryObj<typeof meta>;
 
 export const InitialState: Story = {
     args: {
-        state: 'initial'
+        state: 'initial',
+        onCropImage: fn(),
+        onDelete: fn()
     },
 };
 
