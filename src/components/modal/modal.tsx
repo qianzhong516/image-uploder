@@ -10,7 +10,7 @@ type ModalProps = {
     leftButton: ({ className }: { className: string }) => JSX.Element,
     rightButton: ({ className }: { className: string }) => JSX.Element,
     className?: string,
-    onClose?: () => void,
+    onClose: () => void,
 }
 
 export function ModalImpl({
@@ -25,7 +25,7 @@ export function ModalImpl({
     const buttonStyles = 'text-sm px-0 py-0 w-full';
 
     return (
-        <div className={twMerge('flex flex-col gap-6 p-4 shadow-md', className)}>
+        <div className={twMerge('flex flex-col gap-6 p-4 shadow-md bg-white rounded-md', className)}>
             <div className='flex justify-between w-full'>
                 <div className='flex flex-col gap'>
                     <h1 className="text-lg">{title}</h1>
@@ -45,7 +45,7 @@ export function ModalImpl({
 }
 
 const Backdrop = ({ children }: { children: React.ReactNode }) =>
-    <div className='fixed inset-0 w-full h-full bg-neutral-950/400'>{children}</div>;
+    <div className='fixed inset-0 w-full h-full bg-neutral-950/60'>{children}</div>;
 
 export default function Modal({
     container,
