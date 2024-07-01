@@ -69,13 +69,13 @@ export default function ImageItem({
     ...props
 }: ImageItemProps) {
 
-    const CloseBtn = ({ onClick }: { onClick: () => void }) => <Button theme='tertiary' onClick={onClick} className='absolute top-0 right-0 max-h-[44px]'><CloseIcon /></Button>;
+    const CloseBtn = ({ onClick }: { onClick: () => void }) => <Button theme='tertiary' onClick={onClick} className='absolute top-0 right-0 min-w-fit min-h-fit'><CloseIcon /></Button>;
     const commonProps = { title, totalSize, className };
 
     switch (props.state) {
         case 'complete': {
             const thumbnail = <ProfileIcon src={props.imgSrc} size={80} className='rounded-md' />
-            const rightControl = <RadioButton name='image-item' value={title} />;
+            const rightControl = <RadioButton name='image-item' value={title} className='absolute top-0 right-1' />;
             const bottomControl = <div className='flex gap-1 items-center'>
                 <Button theme='tertiary' prefixIcon={<CropIcon />} className='text-sm' onClick={props.onCropImage}>Crop image</Button> <span className='text-neutral-600 font-bold'>&sdot;</span>
                 <Button theme='tertiary' prefixIcon={<DeleteBinIcon />} className='text-sm' onClick={props.onDelete}>Delete</Button>
