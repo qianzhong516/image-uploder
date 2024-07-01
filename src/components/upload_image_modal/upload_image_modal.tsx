@@ -5,11 +5,13 @@ import { useState } from 'react';
 
 type UploadImageModalProps = {
     allowMutiple: boolean,
+    imageList: React.ReactNode,
     uploadFiles: () => Promise<void>
 }
 
 export default function UploadImageModal({
     allowMutiple,
+    imageList,
     uploadFiles
 }: UploadImageModalProps) {
     const [isOpen, setIsOpen] = useState(true);
@@ -24,5 +26,6 @@ export default function UploadImageModal({
         leftButton={({ className }: { className: string }) => <Button theme='secondary' className={className}>Cancel</Button>}
         rightButton={({ className }: { className: string }) => <Button theme='primary' className={className} >Select Image</Button>}>
         <Dnd multiple={allowMutiple} uploadFiles={uploadFiles} />
+        {imageList}
     </Modal>
 }
