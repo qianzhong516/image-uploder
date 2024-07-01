@@ -1,5 +1,6 @@
 import Button from '@/components/button/button';
 import CloseIcon from '@/components/icons/close';
+import { createPortal } from 'react-dom';
 import { twMerge } from 'tailwind-merge';
 
 type ModalProps = {
@@ -9,10 +10,10 @@ type ModalProps = {
     leftButton: ({ className }: { className: string }) => JSX.Element,
     rightButton: ({ className }: { className: string }) => JSX.Element,
     className?: string,
-    onClose: () => void,
+    onClose?: () => void,
 }
 
-export default function Modal({
+export function ModalImpl({
     title,
     subtitle,
     children,
@@ -41,4 +42,23 @@ export default function Modal({
             </div>
         </div>
     );
+}
+
+const Backdrop = ({ children }: { children: React.ReactNode }) =>
+    <div className='fixed inset-0 w-full h-full bg-neutral-950/400'>{children}</div>;
+
+export default function Modal({
+    container,
+    open,
+    ...props
+}: ModalProps & {
+    container: HTMLElement,
+    open: boolean,
+}) {
+
+    return open && createPortal(
+        <Backdrop>
+            <ModalImpl {...props} />
+        </Backdrop>, container
+    )
 }
