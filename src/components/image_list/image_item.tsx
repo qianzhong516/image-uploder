@@ -20,7 +20,7 @@ type ImageItemWrapperProps = ImageItemCommonProps & {
     bottomControl: React.ReactNode
 }
 
-type ImageItemProps = ImageItemCommonProps & ({
+export type ImageItemProps = ImageItemCommonProps & ({
     state: 'complete',
     imgSrc: string,
     onCropImage: () => void,
@@ -70,7 +70,7 @@ export default function ImageItem({
 }: ImageItemProps) {
 
     const CloseBtn = ({ onClick }: { onClick: () => void }) => <Button theme='tertiary' onClick={onClick} className='absolute top-0 right-0 max-h-[44px]'><CloseIcon /></Button>;
-
+    const commonProps = { title, totalSize, className };
 
     switch (props.state) {
         case 'complete': {
@@ -82,9 +82,7 @@ export default function ImageItem({
             </div>
 
             return <ImageItemWrapper
-                className={className}
-                title={title}
-                totalSize={totalSize}
+                {...commonProps}
                 thumbnail={thumbnail}
                 rightControl={rightControl}
                 bottomControl={bottomControl} />;
@@ -94,9 +92,7 @@ export default function ImageItem({
             const thumbnail = <ProfileIcon src={props.imgSrc} size={80} className='rounded-md' />
 
             return <ImageItemWrapper
-                className={className}
-                title={title}
-                totalSize={totalSize}
+                {...commonProps}
                 thumbnail={thumbnail}
                 rightControl={<CloseBtn onClick={props.onDelete} />}
                 bottomControl={<p className='flex gap-1 items-center text-green-700 text-xs'><CheckIcon /> Upload success!</p>} />;
@@ -107,9 +103,7 @@ export default function ImageItem({
             </div>
 
             return <ImageItemWrapper
-                className={className}
-                title={title}
-                totalSize={totalSize}
+                {...commonProps}
                 thumbnail={thumbnail}
                 rightControl={<CloseBtn onClick={props.onDelete} />}
                 bottomControl={<p className='text-red-600 text-xs'>{props.error}</p>} />;
@@ -119,9 +113,7 @@ export default function ImageItem({
             const thumbnail = <ProfileIcon src={props.imgSrc} size={80} className='rounded-md' />
 
             return <ImageItemWrapper
-                className={className}
-                title={title}
-                totalSize={totalSize}
+                {...commonProps}
                 thumbnail={thumbnail}
                 rightControl={<CloseBtn onClick={props.onCancelUpload} />}
                 bottomControl={bottomControl} />;

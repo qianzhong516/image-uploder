@@ -3,7 +3,7 @@ import ImageItem from './image_item';
 import { fn } from '@storybook/test';
 
 const meta = {
-    title: 'UI/ImageItem',
+    title: 'UI/ImageList/ImageItem',
     component: ImageItem,
     parameters: {
     },
