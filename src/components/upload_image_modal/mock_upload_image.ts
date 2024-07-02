@@ -64,7 +64,6 @@ class Subscriber {
 
   publish(event: string, ...args: any[]) {
     if (this.map.has(event)) {
-      console.log(this.map);
       this.map.get(event)!.forEach((handler) => handler(...args));
     }
   }

@@ -28,11 +28,13 @@ export const View: Story = {
         const [_, updateArgs, resetArgs] = useArgs<{ imageList: ImageListProps }>();
 
         const uploadFiles = async (files: File[]) => {
-            const imagesInUpload: ImageListProps = files.map(file => {
+            const sources = await getImgSrc(files);
+            console.log({ sources })
+            const imagesInUpload: ImageListProps = files.map((file, i) => {
                 return {
                     id: file.name,
                     title: file.name,
-                    imgSrc: '',
+                    imgSrc: sources[i] as string,
                     totalSize: Math.round(file.size / 1024) + 'kb',
                     state: 'loading',
                     progress: 0,
@@ -104,4 +106,24 @@ export const View: Story = {
             <UploadImageModal {...args} uploadFiles={uploadFiles} />
         </div>;
     }
+}
+
+// In order to read files in parallel, we create one fileReader for each file,
+// because one fileReader can only process one file at a time.
+async function getImgSrc(files: File[]) {
+    const results: (string | ArrayBuffer | null)[] = [];
+
+    return await new Promise<(string | ArrayBuffer | null)[]>((res) => {
+        files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                results.push(reader.result);
+                if (files.length === results.length) {
+                    res(results);
+                }
+            }
+            // TODO: file process error handling
+            reader.readAsDataURL(file);
+        })
+    });
 }
