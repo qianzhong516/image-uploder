@@ -1,7 +1,7 @@
 import { ImageItemProps } from './image_item';
 import ImageItem from './image_item';
 
-type ImageListProps = ({
+export type ImageListProps = ({
     id: string,
 } & ImageItemProps)[]
 
