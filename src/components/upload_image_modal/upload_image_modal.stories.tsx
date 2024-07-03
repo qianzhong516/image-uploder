@@ -35,7 +35,7 @@ export const View: Story = {
                     id: file.name,
                     title: file.name,
                     imgSrc: sources[i] as string,
-                    totalSize: Math.round(file.size / 1024) + 'kb',
+                    totalSize: getTotalSize(file.size),
                     state: 'loading',
                     progress: 0,
                     onCancelUpload: fn()
@@ -108,16 +108,29 @@ export const View: Story = {
     }
 }
 
+// up to `MB`
+function getTotalSize(sizeInBytes: number) {
+    if (sizeInBytes < 1000) {
+        return `${sizeInBytes}B`;
+    }
+
+    if (sizeInBytes < 1000 * 1000) {
+        return `${Math.round(sizeInBytes / 1000)}KB`;
+    }
+
+    return `${Math.round(sizeInBytes / 1000 / 1000)}MB`;
+}
+
 // In order to read files in parallel, we create one fileReader for each file,
 // because one fileReader can only process one file at a time.
 async function getImgSrc(files: File[]) {
     const results: (string | ArrayBuffer | null)[] = [];
 
     return await new Promise<(string | ArrayBuffer | null)[]>((res) => {
-        files.forEach((file) => {
+        files.forEach((file, i) => {
             const reader = new FileReader();
             reader.onload = () => {
-                results.push(reader.result);
+                results[i] = reader.result
                 if (files.length === results.length) {
                     res(results);
                 }

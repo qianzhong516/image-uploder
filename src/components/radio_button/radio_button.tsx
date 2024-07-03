@@ -8,7 +8,7 @@ type RadioButtonProps = {
 }
 
 export default function RadioButton({
-    size = 16,
+    size = 20,
     value,
     name,
     className
