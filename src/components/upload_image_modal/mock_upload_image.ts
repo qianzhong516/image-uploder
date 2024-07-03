@@ -4,14 +4,11 @@ export function uploadFileToServer(files: File[]) {
   const progress = new Map();
 
   const errors = files
-    .filter((file) => !file.name.match(/\.(png|jpg|jpeg)$/i))
-    .map((file) => ({
-      fileName: file.name,
-      error: `The file format of ${file.name} is not supported. Please upload an image in one of the following formats: JPG or PNG.`,
-    }));
+    .map((file) => isFileValid(file))
+    .filter(Boolean);
 
-  const validFiles = files.filter((file) =>
-    file.name.match(/\.(png|jpg|jpeg)$/i)
+  const validFiles = files.filter(
+    (file) => isValidName(file) && isValidSize(file)
   );
   validFiles.forEach((file) => {
     progress.set(file.name, { loaded: 0, totalSize: file.size });
@@ -47,6 +44,25 @@ export function uploadFileToServer(files: File[]) {
   }, 1000);
 
   return job;
+}
+
+const isValidSize = (file: File) => file.size <= 5 * 1000 * 1000;
+const isValidName = (file: File) =>
+  file.name.match(/\.(png|jpg|jpeg)$/i);
+
+function isFileValid(file: File) {
+  if (!isValidName(file)) {
+    return {
+      fileName: file.name,
+      error: `The file format of ${file.name} is not supported. Please upload an image in one of the following formats: JPG or PNG.`,
+    };
+  }
+  if (!isValidSize(file)) {
+    return {
+      fileName: file.name,
+      error: `This image is larger than 5MB. Please select a smaller image.`,
+    };
+  }
 }
 
 class Subscriber {
