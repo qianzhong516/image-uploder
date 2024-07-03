@@ -8,13 +8,15 @@ import ImageList from '@/components/image_list/image_list';
 type UploadImageModalProps = {
     allowMutiple: boolean,
     imageList: ImageListProps,
-    uploadFiles: (files: File[]) => Promise<void>
+    imageLimit: number, // max images that can be uploaded
+    uploadFiles: (files: File[]) => Promise<void>,
 }
 
 export default function UploadImageModal({
     allowMutiple,
     imageList,
-    uploadFiles
+    imageLimit,
+    uploadFiles,
 }: UploadImageModalProps) {
     const [isOpen, setIsOpen] = useState(true);
     const footer = (<div className='flex justify-between gap-4'>
@@ -22,7 +24,7 @@ export default function UploadImageModal({
         <Button theme='primary' className="text-sm px-0 py-0 w-full">Select Image</Button>
     </div>);
     const content = (<>
-        <Dnd multiple={allowMutiple} uploadFiles={uploadFiles} />
+        <Dnd multiple={allowMutiple} uploadFiles={uploadFiles} reachedLimit={imageList.length >= imageLimit} />
         <ImageList imageItems={imageList} />
     </>);
 

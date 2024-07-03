@@ -7,6 +7,7 @@ const meta = {
     component: Dnd,
     tags: ['autodocs'],
     args: {
+        reachedLimit: false,
         uploadFiles: fn()
     }
 } satisfies Meta<typeof Dnd>;
@@ -16,7 +17,8 @@ type Story = StoryObj<typeof meta>;
 
 export const AllowMultipleUploads: Story = {
     args: {
-        multiple: true
+        multiple: true,
+
     }
 }
 

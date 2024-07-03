@@ -22,6 +22,7 @@ export const View: Story = {
         imageList: [
             { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), onCropImage: fn() },
         ],
+        imageLimit: 5,
         uploadFiles: fn()
     },
     render: (args) => {
