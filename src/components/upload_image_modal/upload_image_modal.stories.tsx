@@ -4,6 +4,7 @@ import UploadImageModal from './upload_image_modal';
 import { fn } from '@storybook/test';
 import { ImageListProps } from '../image_list/image_list';
 import { uploadFileToServer } from './mock_upload_image';
+import { getImgSrc, getTotalSize } from '@/utils';
 
 const meta = {
     title: 'UI/UploadImgModal',
@@ -18,12 +19,14 @@ type Story = StoryObj<typeof meta>;
 
 export const View: Story = {
     args: {
+        open: true,
         allowMutiple: true,
         imageList: [
             { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), onCropImage: fn() },
         ],
         imageLimit: 5,
-        uploadFiles: fn()
+        uploadFiles: fn(),
+        onClose: fn()
     },
     render: (args) => {
         const [_, updateArgs, resetArgs] = useArgs<{ imageList: ImageListProps }>();
@@ -107,37 +110,4 @@ export const View: Story = {
             <UploadImageModal {...args} uploadFiles={uploadFiles} />
         </div>;
     }
-}
-
-// up to `MB`
-function getTotalSize(sizeInBytes: number) {
-    if (sizeInBytes < 1000) {
-        return `${sizeInBytes}B`;
-    }
-
-    if (sizeInBytes < 1000 * 1000) {
-        return `${Math.round(sizeInBytes / 1000)}KB`;
-    }
-
-    return `${Math.round(sizeInBytes / 1000 / 1000)}MB`;
-}
-
-// In order to read files in parallel, we create one fileReader for each file,
-// because one fileReader can only process one file at a time.
-async function getImgSrc(files: File[]) {
-    const results: (string | ArrayBuffer | null)[] = [];
-
-    return await new Promise<(string | ArrayBuffer | null)[]>((res) => {
-        files.forEach((file, i) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                results[i] = reader.result
-                if (files.length === results.length) {
-                    res(results);
-                }
-            }
-            // TODO: file process error handling
-            reader.readAsDataURL(file);
-        })
-    });
 }

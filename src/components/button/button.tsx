@@ -10,7 +10,7 @@ export type ButtonProps = {
     onClick?: () => void;
 }
 
-export default function Button({ theme, disabled = false, prefixIcon, suffixIcon, className, children }: ButtonProps) {
+export default function Button({ theme, disabled = false, prefixIcon, suffixIcon, className, children, onClick }: ButtonProps) {
     const baseStyles = 'flex gap-2 justify-center items-center rounded focus:outline-none focus-visible:ring disabled:text-neutral-400 min-w-[44px] min-h-[44px]';
     const themeStyles = twJoin(
         theme === 'primary' && 'px-6 py-2 bg-indigo-700 text-white hover:bg-indigo-800 disabled:bg-neutral-200',
@@ -19,7 +19,7 @@ export default function Button({ theme, disabled = false, prefixIcon, suffixIcon
     );
     const styles = twMerge(baseStyles, themeStyles, className);
 
-    return <button className={styles} disabled={disabled}>
+    return <button className={styles} disabled={disabled} onClick={onClick}>
         {prefixIcon}{children}{suffixIcon}
     </button>
 }
