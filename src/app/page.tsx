@@ -4,7 +4,7 @@ import ProfileBanner from '@/components/profile_banner/profile_banner';
 import Image from 'next/image';
 import UploadImageModal from '@/components/upload_image_modal/upload_image_modal';
 import { useCallback, useState } from 'react';
-import axios, { AxiosProgressEvent } from 'axios';
+import axios, { AxiosError, AxiosProgressEvent } from 'axios';
 import { getImgSrc, getTotalSize } from '@/utils';
 import { ImageListProps } from '@/components/image_list/image_list';
 
@@ -32,7 +32,8 @@ export default function Home() {
     setImageList(prev => [...prev, ...imagesInUpload]);
 
     // upload files
-    files.forEach((file, i) => {
+    files.forEach((file, index) => {
+      const i = imageList.length + index;
       const formData = new FormData();
       formData.append('file', file);
       const config = {
@@ -42,7 +43,6 @@ export default function Home() {
         onUploadProgress: (progressEvent: AxiosProgressEvent) => {
           const { loaded, total } = progressEvent;
           if (!total) { return }
-          console.log(Math.round(loaded / total * 100))
           // use setState callback here to avoid stale state
           setImageList(prev => {
             const updated = [...prev];
@@ -52,10 +52,6 @@ export default function Home() {
             }
             return updated;
           });
-        },
-
-        onerror: () => {
-
         }
       }
 
@@ -73,7 +69,7 @@ export default function Home() {
               onDelete: () => { } // TODO:
             });
           }
-          return updated
+          return updated;
         });
 
         setTimeout(() => {
@@ -95,7 +91,28 @@ export default function Home() {
           })
         }, 2000);
       }).catch(err => {
-        console.log(err);
+        if (err instanceof AxiosError) {
+          setImageList(prev => {
+            const updated = [...prev];
+            const item = updated[i];
+            let error = err.response?.data.message;
+
+            if (err.code === AxiosError.ERR_NETWORK) {
+              error = 'An error occurred during the upload. Please check your network connection and try again.';
+            }
+
+            updated.splice(i, 1, {
+              state: 'error',
+              id: item.title,
+              title: item.title,
+              totalSize: item.totalSize,
+              onDelete: () => { }, // TODO:
+              error
+            });
+
+            return updated;
+          })
+        }
       });
     });
   };
