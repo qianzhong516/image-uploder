@@ -1,12 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
 import path from 'path';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function DELETE(req: NextRequest) {
-  const res = await req.json();
+// TODO: delete the record from db
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const fileId = params.id;
   try {
     await unlink(
-      path.resolve(process.cwd(), `public/uploads/${res.id}`)
+      path.resolve(process.cwd(), `public/uploads/${fileId}`)
     );
     return NextResponse.json(
       {
