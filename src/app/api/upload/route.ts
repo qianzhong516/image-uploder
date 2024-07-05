@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
     const writePath = path.resolve(
       process.cwd(),
-      `public/uploads/${Date.now()}_${file.name}`
+      `public/uploads/${file.name}`
     );
     await writeFile(writePath, buffer);
 

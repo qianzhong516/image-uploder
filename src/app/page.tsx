@@ -4,7 +4,8 @@ import ProfileBanner from '@/components/profile_banner/profile_banner';
 import Image from 'next/image';
 import UploadImageModal from '@/components/upload_image_modal/upload_image_modal';
 import { useCallback, useState } from 'react';
-import axios, { AxiosError, AxiosProgressEvent } from 'axios';
+import { AxiosError, AxiosProgressEvent } from 'axios';
+import axios from '@/axios';
 import { getImgSrc, getTotalSize } from '@/utils';
 import { ImageListProps } from '@/components/image_list/image_list';
 import { useImmer } from "use-immer";
@@ -15,6 +16,18 @@ export default function Home() {
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
+  const createDeleteImageHandler = useCallback((i: number, id: string) => async () => {
+    setImageList(draft => {
+      draft.splice(i, 1);
+      return draft;
+    });
+    await axios.delete(`api/delete`, {
+      data: { id }
+    }).catch(err => {
+      // TODO: show the error in a toast
+      console.log(err);
+    });
+  }, [setImageList]);
   const handleUploadImage = async (files: File[]) => {
     // append pending processes in UI
     const sources = await getImgSrc(files);
@@ -52,7 +65,7 @@ export default function Home() {
         }
       }
 
-      axios.post('http://localhost:3000/api/upload', formData, config).then(res => {
+      axios.post('/api/upload', formData, config).then(res => {
         setImageList(draft => {
           const item = draft[i]
           if (item.state === 'loading') {
@@ -62,7 +75,7 @@ export default function Home() {
               title: item.title,
               totalSize: item.totalSize,
               imgSrc: item.imgSrc,
-              onDelete: () => { } // TODO:
+              onDelete: createDeleteImageHandler(i, item.title)
             }
           }
         });
@@ -78,7 +91,7 @@ export default function Home() {
                 totalSize: item.totalSize,
                 imgSrc: item.imgSrc,
                 onCropImage: () => { }, // TODO:
-                onDelete: () => { } // TODO:
+                onDelete: createDeleteImageHandler(i, item.title)
               };
             }
           })
@@ -98,7 +111,10 @@ export default function Home() {
               id: item.title,
               title: item.title,
               totalSize: item.totalSize,
-              onDelete: () => { }, // TODO:
+              onDelete: () => setImageList(draft => {
+                draft.splice(i, 1);
+                return draft;
+              }),
               error
             }
           })
