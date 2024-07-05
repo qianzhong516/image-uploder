@@ -28,25 +28,36 @@ export default function Home() {
       console.log(err);
     });
   }, [setImageList]);
-  const handleUploadImage = async (files: File[]) => {
-    // append pending processes in UI
-    const sources = await getImgSrc(files);
-    const imagesInUpload: ImageListProps = files.map((file, i) => {
-      return {
-        id: file.name,
-        title: file.name,
-        imgSrc: sources[i] as string,
-        totalSize: getTotalSize(file.size),
-        state: 'loading',
-        progress: 0,
-        onCancelUpload: () => { } // TODO:
-      }
+  const createCancelUploadHandler = useCallback((i: number, controller: AbortController) => () => {
+    setImageList(draft => {
+      draft.splice(i, 1);
+      return draft;
     });
-    setImageList(draft => draft.concat(imagesInUpload));
+    controller.abort('Cancel upload.');
+  }, [setImageList]);
+  const handleUploadImage = async (files: File[]) => {
+    // read image baseUrls in parallel
+    const sources = await getImgSrc(files);
 
-    // upload files
     files.forEach((file, index) => {
       const i = imageList.length + index;
+      const title = files[i].name;
+      const imgSrc = sources[index] as string;
+      const totalSize = getTotalSize(file.size);
+
+      const controller = new AbortController();
+      setImageList(draft => {
+        draft[i] = {
+          state: 'loading',
+          id: title,
+          title,
+          imgSrc,
+          totalSize,
+          progress: 0,
+          onCancelUpload: createCancelUploadHandler(i, controller)
+        }
+      });
+
       const formData = new FormData();
       formData.append('file', file);
       const config = {
@@ -62,44 +73,47 @@ export default function Home() {
               draft[i].progress = Math.round(loaded / total * 100);
             }
           });
-        }
+        },
+        signal: controller.signal
       }
 
       axios.post('/api/upload', formData, config).then(res => {
         setImageList(draft => {
           const item = draft[i]
-          if (item.state === 'loading') {
-            draft[i] = {
-              state: 'load-success',
-              id: item.title, // use titles as id
-              title: item.title,
-              totalSize: item.totalSize,
-              imgSrc: item.imgSrc,
-              onDelete: createDeleteImageHandler(i, item.title)
-            }
+          draft[i] = {
+            state: 'load-success',
+            id: title, // use titles as id
+            title,
+            totalSize,
+            imgSrc,
+            onDelete: createDeleteImageHandler(i, item.title)
           }
         });
 
         setTimeout(() => {
           setImageList(draft => {
             const item = draft[i];
-            if (item.state === 'load-success') {
-              draft[i] = {
-                state: 'complete',
-                id: item.title,
-                title: item.title,
-                totalSize: item.totalSize,
-                imgSrc: item.imgSrc,
-                onCropImage: () => { }, // TODO:
-                onDelete: createDeleteImageHandler(i, item.title)
-              };
-            }
+            draft[i] = {
+              state: 'complete',
+              id: title,
+              title,
+              totalSize,
+              imgSrc,
+              onCropImage: () => { }, // TODO:
+              onDelete: createDeleteImageHandler(i, item.title)
+            };
           })
         }, 2000);
       }).catch(err => {
+        console.log(err)
+
         if (err instanceof AxiosError) {
           setImageList(draft => {
             let error = err.response?.data.message;
+
+            if (err.code === AxiosError.ERR_CANCELED) {
+              error = 'The uploading process has been cancelled';
+            }
 
             if (err.code === AxiosError.ERR_NETWORK) {
               error = 'An error occurred during the upload. Please check your network connection and try again.';
@@ -108,9 +122,9 @@ export default function Home() {
             const item = draft[i];
             draft[i] = {
               state: 'error',
-              id: item.title,
-              title: item.title,
-              totalSize: item.totalSize,
+              id: title,
+              title,
+              totalSize,
               onDelete: () => setImageList(draft => {
                 draft.splice(i, 1);
                 return draft;
