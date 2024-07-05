@@ -2,6 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { writeFile } from 'fs/promises';
 import path from 'path';
 import z, { ZodError } from 'zod';
+import ProfileIcon from '@/models/ProfileIcon';
+import dbConnect from '@/lib/dbconnect';
+
+// TODO: remove this later
+const USER_ID = '66882ac39085ad43fb32ce05';
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -34,6 +39,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  await dbConnect();
+
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -43,11 +50,19 @@ export async function POST(req: NextRequest) {
     );
     await writeFile(writePath, buffer);
 
+    await ProfileIcon.create({
+      title: file.name,
+      totalSizeInBytes: file.size,
+      path: `/uploads/${file.name}`,
+      uploadedBy: USER_ID,
+    });
+
     return NextResponse.json(
       { message: 'File uploaded' },
       { status: 200 }
     );
-  } catch (_) {
+  } catch (error) {
+    console.log(error);
     return NextResponse.json(
       {
         message:
