@@ -3,12 +3,16 @@
 import ProfileBanner from '@/components/profile_banner/profile_banner';
 import Image from 'next/image';
 import UploadImageModal from '@/components/upload_image_modal/upload_image_modal';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AxiosError, AxiosProgressEvent } from 'axios';
 import axios from '@/axios';
 import { getImgSrc, getTotalSize } from '@/utils';
 import { ImageListProps } from '@/components/image_list/image_list';
 import { useImmer } from "use-immer";
+import { ProfileIcons } from '@/models/ProfileIcon';
+
+// TODO: remove this later
+const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +25,7 @@ export default function Home() {
       draft.splice(i, 1);
       return draft;
     });
-    await axios.delete(`api/delete`, {
-      data: { id }
-    }).catch(err => {
+    await axios.delete(`api/profile-icons/${id}`).catch(err => {
       // TODO: show the error in a toast
       console.log(err);
     });
@@ -136,6 +138,28 @@ export default function Home() {
       });
     });
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // TODO: handle data fetch issue UI
+      axios.get('/api/profile-icons', {
+        params: {
+          userId: CURRENT_USER_ID
+        }
+      }).then(res => {
+        console.log(res.data);
+        setImageList(res.data.message.map(({ title, totalSizeInBytes, path }: ProfileIcons, i: number) => ({
+          state: 'complete',
+          id: title,
+          title,
+          totalSize: totalSizeInBytes,
+          imgSrc: path,
+          onCropImage: () => { }, // TODO:
+          onDelete: createDeleteImageHandler(i, title)
+        })))
+      });
+    }
+  }, [createDeleteImageHandler, isOpen, setImageList]);
 
   return (
     <div className='w-full max-w-[600px] mt-[200px] mx-auto'>
