@@ -24,9 +24,9 @@ export const View: Story = {
         imageList: [
             { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), onCropImage: fn() },
         ],
-        imageLimit: 5,
         uploadFiles: fn(),
-        onClose: fn()
+        onClose: fn(),
+        onSelectImage: fn(),
     },
     render: (args) => {
         const [_, updateArgs, resetArgs] = useArgs<{ imageList: ImageListProps }>();

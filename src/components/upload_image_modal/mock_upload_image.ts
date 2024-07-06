@@ -15,7 +15,7 @@ export function uploadFileToServer(files: File[]) {
   });
 
   const timerId = setInterval(() => {
-    // wait for job to be subscribed during the first interval
+    // wait for job events to be subscribed during the first interval
     job.publish('error', errors);
     validFiles.forEach((file) => {
       const chunkSize = 1024 * 10;

@@ -3,13 +3,11 @@ import { ChangeEvent, DragEvent, useRef } from 'react';
 
 type DndProps = {
     multiple: boolean,
-    reachedLimit: boolean,
     uploadFiles: (files: File[]) => Promise<void>,
 }
 
 export default function Dnd({
     multiple,
-    reachedLimit,
     uploadFiles
 }: DndProps) {
     const ref = useRef<HTMLDivElement>(null);
@@ -52,12 +50,7 @@ export default function Dnd({
         uploadFiles(files);
     }
 
-    return reachedLimit ? (
-        <div className="flex flex-col gap justify-center items-center p-4 bg-neutral-50 border-2 border-neutral-200 rounded">
-            <h2 className='text-md text-red-600 font-semibold'>You have reached the image limit</h2>
-            <p className='text-xs text-neutral-600'>Remove one or more to upload more images.</p>
-        </div>
-    ) : (
+    return (
         <div className="flex flex-col gap-4 justify-center items-center p-4 bg-neutral-50 border-2 border-neutral-200 rounded" onDragOver={handleOnDragOver} onDrop={handleOnDrop} ref={ref} onDragLeave={handleOnDragLeave}>
             <div>
                 <label htmlFor="profile-icon-uploader" className='block text-indigo-500 rounded-full p-2 cursor-pointer shadow focus-within:outline focus-within:outline-2'>

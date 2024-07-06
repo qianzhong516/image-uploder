@@ -7,7 +7,6 @@ const meta = {
     component: Dnd,
     tags: ['autodocs'],
     args: {
-        reachedLimit: false,
         uploadFiles: fn()
     }
 } satisfies Meta<typeof Dnd>;

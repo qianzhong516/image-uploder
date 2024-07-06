@@ -14,9 +14,12 @@ import { ProfileIcons } from '@/models/ProfileIcon';
 // TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
+const IMAGE_UPLOAD_LIMIT = 5;
+
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [imageList, setImageList] = useImmer<ImageListProps>([]);
+  const [hasFetchError, setHasFetchError] = useState(false);
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
@@ -37,6 +40,7 @@ export default function Home() {
     });
     controller.abort('Cancel upload.');
   }, [setImageList]);
+  const handleSelectImage = () => { };
   const handleUploadImage = async (files: File[]) => {
     // read image baseUrls in parallel
     const sources = await getImgSrc(files);
@@ -121,7 +125,6 @@ export default function Home() {
               error = 'An error occurred during the upload. Please check your network connection and try again.';
             }
 
-            const item = draft[i];
             draft[i] = {
               state: 'error',
               id: title,
@@ -157,6 +160,8 @@ export default function Home() {
           onCropImage: () => { }, // TODO:
           onDelete: createDeleteImageHandler(i, title)
         })))
+      }).catch(_ => {
+        setHasFetchError(true);
       });
     }
   }, [createDeleteImageHandler, isOpen, setImageList]);
@@ -177,9 +182,10 @@ export default function Home() {
         open={isOpen}
         allowMutiple={true}
         imageList={Array.from(imageList.values())}
-        imageLimit={5}
+        error={imageList.length >= IMAGE_UPLOAD_LIMIT ? 'reachedLimit' : hasFetchError ? 'dataFetch' : undefined}
         uploadFiles={handleUploadImage}
         onClose={handleOnClose}
+        onSelectImage={handleSelectImage}
       />}
     </div>
   );
