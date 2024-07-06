@@ -20,34 +20,32 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [imageList, setImageList] = useImmer<ImageListProps>([]);
   const [hasFetchError, setHasFetchError] = useState(false);
+  // const [selectedImageId, setSelectedImageId] = useState('');
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
-  const createDeleteImageHandler = useCallback((i: number, id: string) => async () => {
-    setImageList(draft => {
-      draft.splice(i, 1);
-      return draft;
-    });
-    await axios.delete(`api/profile-icons/${id}`).catch(err => {
+  const handleOnConfirm = () => { };
+
+  const createDeleteImageHandler = useCallback((fileName: string) => async () => {
+    setImageList(draft => draft.filter(d => d.title !== fileName));
+    await axios.delete(`api/profile-icons/${fileName}`).catch(err => {
       // TODO: show the error in a toast
       console.log(err);
     });
   }, [setImageList]);
-  const createCancelUploadHandler = useCallback((i: number, controller: AbortController) => () => {
-    setImageList(draft => {
-      draft.splice(i, 1);
-      return draft;
-    });
+
+  const createCancelUploadHandler = useCallback((fileName: string, controller: AbortController) => () => {
+    setImageList(draft => draft.filter(d => d.title !== fileName));
     controller.abort('Cancel upload.');
   }, [setImageList]);
-  const handleSelectImage = () => { };
+
   const handleUploadImage = async (files: File[]) => {
     // read image baseUrls in parallel
     const sources = await getImgSrc(files);
 
     files.forEach((file, index) => {
       const i = imageList.length + index;
-      const title = files[i].name;
+      const title = files[index].name;
       const imgSrc = sources[index] as string;
       const totalSize = getTotalSize(file.size);
 
@@ -60,7 +58,7 @@ export default function Home() {
           imgSrc,
           totalSize,
           progress: 0,
-          onCancelUpload: createCancelUploadHandler(i, controller)
+          onCancelUpload: createCancelUploadHandler(title, controller)
         }
       });
 
@@ -92,7 +90,7 @@ export default function Home() {
             title,
             totalSize,
             imgSrc,
-            onDelete: createDeleteImageHandler(i, item.title)
+            onDelete: createDeleteImageHandler(item.title)
           }
         });
 
@@ -106,7 +104,7 @@ export default function Home() {
               totalSize,
               imgSrc,
               onCropImage: () => { }, // TODO:
-              onDelete: createDeleteImageHandler(i, item.title)
+              onDelete: createDeleteImageHandler(item.title)
             };
           })
         }, 2000);
@@ -130,10 +128,7 @@ export default function Home() {
               id: title,
               title,
               totalSize,
-              onDelete: () => setImageList(draft => {
-                draft.splice(i, 1);
-                return draft;
-              }),
+              onDelete: () => setImageList(draft => draft.filter(d => d.title !== title)),
               error
             }
           })
@@ -158,7 +153,7 @@ export default function Home() {
           totalSize: totalSizeInBytes,
           imgSrc: path,
           onCropImage: () => { }, // TODO:
-          onDelete: createDeleteImageHandler(i, title)
+          onDelete: createDeleteImageHandler(title)
         })))
       }).catch(_ => {
         setHasFetchError(true);
@@ -185,7 +180,7 @@ export default function Home() {
         error={imageList.length >= IMAGE_UPLOAD_LIMIT ? 'reachedLimit' : hasFetchError ? 'dataFetch' : undefined}
         uploadFiles={handleUploadImage}
         onClose={handleOnClose}
-        onSelectImage={handleSelectImage}
+        onConfirm={handleOnConfirm}
       />}
     </div>
   );

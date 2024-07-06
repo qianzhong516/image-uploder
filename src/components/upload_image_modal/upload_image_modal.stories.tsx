@@ -26,7 +26,7 @@ export const View: Story = {
         ],
         uploadFiles: fn(),
         onClose: fn(),
-        onSelectImage: fn(),
+        onConfirm: fn(),
     },
     render: (args) => {
         const [_, updateArgs, resetArgs] = useArgs<{ imageList: ImageListProps }>();

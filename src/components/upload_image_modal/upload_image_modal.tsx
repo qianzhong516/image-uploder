@@ -12,7 +12,7 @@ type UploadImageModalProps = {
     error?: 'dataFetch' | 'reachedLimit',
     uploadFiles: (files: File[]) => Promise<void>,
     onClose: () => void,
-    onSelectImage: () => void,
+    onConfirm: () => void,
 }
 
 export default function UploadImageModal({
@@ -22,11 +22,11 @@ export default function UploadImageModal({
     error,
     uploadFiles,
     onClose,
-    onSelectImage
+    onConfirm
 }: UploadImageModalProps) {
     const footer = (<div className='flex justify-between gap-4'>
         <Button theme='secondary' className="text-sm px-0 py-0 w-full" onClick={onClose}>Cancel</Button>
-        <Button theme='primary' className="text-sm px-0 py-0 w-full" onClick={onSelectImage}>Select Image</Button>
+        <Button theme='primary' className="text-sm px-0 py-0 w-full" onClick={onConfirm}>Select Image</Button>
     </div>);
     const reachedLimitError = <div className="flex flex-col gap justify-center items-center p-4 bg-neutral-50 border-2 border-neutral-200 rounded">
         <h2 className='text-md text-red-600 font-semibold'>You have reached the image limit</h2>
