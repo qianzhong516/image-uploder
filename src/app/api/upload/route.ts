@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { writeFile } from 'fs/promises';
+import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import z, { ZodError } from 'zod';
 import ProfileIcon from '@/models/ProfileIcon';
@@ -44,16 +45,20 @@ export async function POST(req: NextRequest) {
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const writePath = path.resolve(
+    const dir = path.resolve(
       process.cwd(),
-      `public/uploads/${file.name}`
+      `public/uploads/${USER_ID}/`
     );
-    await writeFile(writePath, buffer);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+
+    await writeFile(path.resolve(dir, file.name), buffer);
 
     await ProfileIcon.create({
       title: file.name,
       totalSizeInBytes: file.size,
-      path: `/uploads/${file.name}`,
+      path: `/uploads/${USER_ID}/${file.name}`,
       uploadedBy: USER_ID,
     });
 
