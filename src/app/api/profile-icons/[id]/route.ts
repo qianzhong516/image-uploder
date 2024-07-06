@@ -1,8 +1,9 @@
 import { unlink } from 'fs/promises';
 import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
+import ProfileIcon from '@/models/ProfileIcon';
 
-// TODO: delete the record from db
+// profile-icons/[id]
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -12,6 +13,10 @@ export async function DELETE(
     await unlink(
       path.resolve(process.cwd(), `public/uploads/${fileId}`)
     );
+    await ProfileIcon.deleteOne({
+      title: fileId,
+    });
+
     return NextResponse.json(
       {
         message: 'Image has been deleted.',

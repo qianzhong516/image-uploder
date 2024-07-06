@@ -2,6 +2,7 @@ import dbConnect from '@/lib/dbconnect';
 import ProfileIcon from '@/models/ProfileIcon';
 import { NextRequest, NextResponse } from 'next/server';
 
+// profile-icons?userId=[userId]
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url!);
