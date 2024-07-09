@@ -20,11 +20,18 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [imageList, setImageList] = useImmer<ImageListProps>([]);
   const [hasFetchError, setHasFetchError] = useState(false);
-  // const [selectedImageId, setSelectedImageId] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
-  const handleOnConfirm = () => { };
+  const handleOnConfirm = async () => {
+    setIsOpen(false);
+    await axios.put(`api/user/${CURRENT_USER_ID}`, {
+      data: {
+        profileIconTitle: selectedOption
+      }
+    });
+  };
 
   const createDeleteImageHandler = useCallback((fileName: string) => async () => {
     setImageList(draft => draft.filter(d => d.title !== fileName));
@@ -45,7 +52,7 @@ export default function Home() {
 
     files.forEach((file, index) => {
       const i = imageList.length + index;
-      const title = files[index].name;
+      const title = files[index].name; // TODO: deal with duplicate file name
       const imgSrc = sources[index] as string;
       const totalSize = getTotalSize(file.size);
 
@@ -103,6 +110,7 @@ export default function Home() {
               title,
               totalSize,
               imgSrc,
+              onChangeSelection: (e) => setSelectedOption(e.target.value),
               onCropImage: () => { }, // TODO:
               onDelete: createDeleteImageHandler(item.title)
             };
@@ -139,7 +147,6 @@ export default function Home() {
 
   useEffect(() => {
     if (isOpen) {
-      // TODO: handle data fetch issue UI
       axios.get('/api/profile-icons', {
         params: {
           userId: CURRENT_USER_ID
@@ -152,8 +159,10 @@ export default function Home() {
           title,
           totalSize: totalSizeInBytes,
           imgSrc: path,
+          onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
+            setSelectedOption(e.target.value),
           onCropImage: () => { }, // TODO:
-          onDelete: createDeleteImageHandler(title)
+          onDelete: createDeleteImageHandler(title),
         })))
       }).catch(_ => {
         setHasFetchError(true);
