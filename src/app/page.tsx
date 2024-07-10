@@ -21,16 +21,21 @@ export default function Home() {
   const [imageList, setImageList] = useImmer<ImageListProps>([]);
   const [hasFetchError, setHasFetchError] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
+  const [profileIcon, setProfileIcon] = useState('');
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
   const handleOnConfirm = async () => {
     setIsOpen(false);
-    await axios.put(`api/user/${CURRENT_USER_ID}`, {
+    const res = await axios.put(`api/user/${CURRENT_USER_ID}`, {
       data: {
         profileIconTitle: selectedOption
       }
     });
+    const profileIcon = res.data.message.profileIcon;
+    if (profileIcon) {
+      setProfileIcon(profileIcon);
+    }
   };
 
   const createDeleteImageHandler = useCallback((fileName: string) => async () => {
@@ -146,6 +151,21 @@ export default function Home() {
   };
 
   useEffect(() => {
+    async function getUserProfile() {
+      try {
+        const res = await axios.get(`/api/user/${CURRENT_USER_ID}`);
+        const profileIcon = res.data.message.profileIcon;
+        if (profileIcon) {
+          setProfileIcon(profileIcon);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getUserProfile();
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       axios.get('/api/profile-icons', {
         params: {
@@ -173,7 +193,7 @@ export default function Home() {
   return (
     <div className='w-full max-w-[600px] mt-[200px] mx-auto'>
       <ProfileBanner
-        profileIconSrc='/avatar-jack.jpg'
+        profileIconSrc={profileIcon}
         name='Jack Smith'
         handler='kingjack'
         title='Senior Product Designer'
