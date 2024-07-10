@@ -151,7 +151,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    async function getUserProfile() {
+    async function displayUserProfileIcon() {
       try {
         const res = await axios.get(`/api/user/${CURRENT_USER_ID}`);
         const profileIcon = res.data.message.profileIcon;
@@ -162,18 +162,20 @@ export default function Home() {
         console.log(err);
       }
     }
-    getUserProfile();
+
+    displayUserProfileIcon();
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      axios.get('/api/profile-icons', {
-        params: {
-          userId: CURRENT_USER_ID
-        }
-      }).then(res => {
-        console.log(res.data);
-        setImageList(res.data.message.map(({ title, totalSizeInBytes, path }: ProfileIcons, i: number) => ({
+    async function displayUploadedIcons() {
+      try {
+        const res = await axios.get('/api/profile-icons', {
+          params: {
+            userId: CURRENT_USER_ID
+          }
+        });
+        const icons = res.data.message || [];
+        setImageList(icons.map(({ title, totalSizeInBytes, path }: ProfileIcons, i: number) => ({
           state: 'complete',
           id: title,
           title,
@@ -183,10 +185,14 @@ export default function Home() {
             setSelectedOption(e.target.value),
           onCropImage: () => { }, // TODO:
           onDelete: createDeleteImageHandler(title),
-        })))
-      }).catch(_ => {
+        })));
+      } catch (_) {
         setHasFetchError(true);
-      });
+      }
+    }
+
+    if (isOpen) {
+      displayUploadedIcons();
     }
   }, [createDeleteImageHandler, isOpen, setImageList]);
 
