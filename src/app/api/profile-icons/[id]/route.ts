@@ -9,9 +9,15 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const fileId = params.id;
+  const data = await req.json();
+  const { uploadedBy } = data;
+
   try {
     await unlink(
-      path.resolve(process.cwd(), `public/uploads/${fileId}`)
+      path.resolve(
+        process.cwd(),
+        `public/uploads/${uploadedBy}/${fileId}`
+      )
     );
     await ProfileIcon.deleteOne({
       title: fileId,

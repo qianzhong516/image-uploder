@@ -40,7 +40,11 @@ export default function Home() {
 
   const createDeleteImageHandler = useCallback((fileName: string) => async () => {
     setImageList(draft => draft.filter(d => d.title !== fileName));
-    await axios.delete(`api/profile-icons/${fileName}`).catch(err => {
+    await axios.delete(`api/profile-icons/${fileName}`, {
+      data: {
+        uploadedBy: CURRENT_USER_ID
+      }
+    }).catch(err => {
       // TODO: show the error in a toast
       console.log(err);
     });
