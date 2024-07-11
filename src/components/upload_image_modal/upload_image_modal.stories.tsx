@@ -22,7 +22,7 @@ export const View: Story = {
         open: true,
         allowMutiple: true,
         imageList: [
-            { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), onCropImage: fn() },
+            { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), onCropImage: fn(), onChangeSelection: fn() },
         ],
         uploadFiles: fn(),
         onClose: fn(),
@@ -82,7 +82,8 @@ export const View: Story = {
                             totalSize: item.totalSize,
                             imgSrc: item.imgSrc,
                             onCropImage: fn(),
-                            onDelete: fn()
+                            onDelete: fn(),
+                            onChangeSelection: fn()
                         });
                         updateArgs({ imageList: updatedList });
                     }, 2000);

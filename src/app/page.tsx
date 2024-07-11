@@ -25,7 +25,7 @@ export default function Home() {
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const handleOnClose = useCallback(() => setIsOpen(false), []);
-  const handleOnConfirm = async () => {
+  const handleOnConfirm = useCallback(async () => {
     setIsOpen(false);
     const res = await axios.put(`api/user/${CURRENT_USER_ID}`, {
       data: {
@@ -36,7 +36,7 @@ export default function Home() {
     if (profileIcon) {
       setProfileIcon(profileIcon);
     }
-  };
+  }, [selectedOption]);
 
   const createDeleteImageHandler = useCallback((fileName: string) => async () => {
     setImageList(draft => draft.filter(d => d.title !== fileName));

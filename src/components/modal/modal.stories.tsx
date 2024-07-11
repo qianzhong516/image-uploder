@@ -11,7 +11,7 @@ const meta = {
     },
     tags: ['autodocs'],
     args: {
-        onClose: fn()
+        onClose: fn(),
     },
 } satisfies Meta<typeof Modal>;
 
@@ -20,6 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 export const View: Story = {
     args: {
+        ID: 'uploadImage',
         title: 'Upload image(s)',
         subtitle: 'You may upload up to 5 images',
         content: <div className='bg-[#E5E5E5] w-full h-[300px] p-2'>Modal Content</div>,

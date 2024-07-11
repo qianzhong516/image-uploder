@@ -2,8 +2,11 @@ import Button from '@/components/button/button';
 import CloseIcon from '@/components/icons/close';
 import { createPortal } from 'react-dom';
 import { twMerge } from 'tailwind-merge';
+import { ModalContext, ModalKey } from './modalContext';
+import { useContext, useEffect } from 'react';
 
 type ModalProps = {
+    ID: ModalKey,
     title: string,
     subtitle: string,
     content: React.ReactNode,
@@ -46,10 +49,19 @@ export default function Modal({
     container: HTMLElement,
     open: boolean,
 }) {
+    const { modals, updateModals } = useContext(ModalContext);
+    const id = props.ID;
+    const currentKey = modals.at(-1);
 
-    return open && createPortal(
+    useEffect(() => {
+        updateModals(modals => Array.from(new Set([...modals, id])));
+
+        return () => updateModals(modals => modals.filter(m => m !== id));
+    }, [id, updateModals]);
+
+    return currentKey === id && open && createPortal(
         <Backdrop>
             <ModalImpl {...props} />
         </Backdrop>, container
-    )
+    );
 }
