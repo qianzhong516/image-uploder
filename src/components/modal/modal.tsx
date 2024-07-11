@@ -8,7 +8,7 @@ import { useContext, useEffect } from 'react';
 type ModalProps = {
     ID: ModalKey,
     title: string,
-    subtitle: string,
+    subtitle?: string,
     content: React.ReactNode,
     footer: React.ReactNode,
     className?: string,
@@ -25,10 +25,10 @@ export function ModalImpl({
 }: ModalProps) {
     return (
         <div className={twMerge('flex flex-col gap-6 p-4 shadow-md bg-white rounded-md', className)}>
-            <div className='flex justify-between w-full'>
+            <div className='flex justify-between w-full items-center'>
                 <div className='flex flex-col gap'>
                     <h1 className="text-lg">{title}</h1>
-                    <p className="text-sm text-neutral-400">{subtitle}</p>
+                    {subtitle && <p className="text-sm text-neutral-400">{subtitle}</p>}
                 </div>
                 <Button theme='tertiary' onClick={onClose}><CloseIcon /></Button>
             </div>

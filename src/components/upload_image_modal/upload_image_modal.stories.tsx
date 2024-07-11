@@ -5,13 +5,19 @@ import { fn } from '@storybook/test';
 import { ImageListProps } from '../image_list/image_list';
 import { uploadFileToServer } from './mock_upload_image';
 import { getImgSrc, getTotalSize } from '@/utils';
+import ModalContextProvider from '../modal/modalContext';
 
 const meta = {
-    title: 'UI/UploadImgModal',
+    title: 'UI/Modal/UploadImgModal',
     component: UploadImageModal,
     tags: ['!autodocs'],
     args: {
-    }
+    },
+    decorators: [
+        storyFn => {
+            return (<ModalContextProvider>{storyFn()}</ModalContextProvider>)
+        }
+    ]
 } satisfies Meta<typeof UploadImageModal>;
 
 export default meta;

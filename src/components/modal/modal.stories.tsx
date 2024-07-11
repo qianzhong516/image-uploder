@@ -4,7 +4,7 @@ import { fn } from '@storybook/test';
 import Button from '@/components/button/button';
 
 const meta = {
-    title: 'UI/Modal',
+    title: 'UI/Modal/Default',
     component: Modal,
     parameters: {
         layout: 'centered',
