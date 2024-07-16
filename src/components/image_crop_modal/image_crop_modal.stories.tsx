@@ -12,7 +12,7 @@ const meta = {
     tags: ['!autodocs'],
     args: {
         open: true,
-        imageSrc: '/avatar-jack.jpg',
+        imageSrc: '/avatar-john.png',
         onClose: fn(),
         onCrop: fn()
     },

@@ -1,13 +1,65 @@
 import Modal from '@/components/modal/modal';
-import Image from 'next/image';
 import Button from '@/components/button/button'
+import { useEffect, useRef } from 'react';
+import CropperImpl, { ReactCropperElement } from "react-cropper";
+import "@/lib/cropperjs/cropper.css";
+import CropperTypes from 'cropperjs';
 
 type ImageCropModalProps = {
     open: boolean,
     imageSrc: string,
     onClose: () => void,
-    onCrop: () => void
+    onCrop: (props: CropperTypes.CropBoxData) => void
 }
+
+type CropperProps = {
+    imageSrc: string,
+    onCropMove?: (props: CropperTypes.CropBoxData) => void,
+}
+
+const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
+    const cropperRef = useRef<ReactCropperElement>(null);
+    const onCrop = () => {
+        const cropper = cropperRef.current?.cropper;
+        if (!cropper) {
+            return;
+        }
+        onCropMove?.(cropper.getCropBoxData());
+    };
+    const timer = useRef<NodeJS.Timeout | null>(null);
+
+    // customise the styles of the cropper
+    useEffect(() => {
+        timer.current = setInterval(() => {
+            if (!cropperRef.current) {
+                return;
+            }
+
+            const lines = cropperRef.current.parentNode?.querySelectorAll('.cropper-line');
+            const pointers = cropperRef.current.parentNode?.querySelectorAll('.cropper-point');
+
+            if (lines && lines.length && pointers && pointers.length) {
+                timer.current && clearInterval(timer.current)
+                lines.forEach(line => line.classList.add('!hidden'));
+                Array.from(pointers).slice(0, 4).forEach(p => p.classList.add('!hidden'));
+            }
+        }, 100);
+
+        return () => { timer.current && clearInterval(timer.current) };
+    }, [])
+
+    return (
+        <CropperImpl
+            src={imageSrc}
+            aspectRatio={1}
+            guides={false}
+            crop={onCrop}
+            dragMode='none'
+            viewMode={1} // cropbox is restrict to the canavs
+            ref={cropperRef}
+        />
+    );
+};
 
 export default function ImageCropModal({
     open,
@@ -15,20 +67,26 @@ export default function ImageCropModal({
     onClose,
     onCrop
 }: ImageCropModalProps) {
-    const content = (
-        <div className='bg-black w-full h-full'>
-            <Image src={imageSrc} width={200} height={150} alt='' objectFit='contain' objectPosition='center' className='m-auto' />
-        </div>
-    )
+    const cropBoxData = useRef<CropperTypes.CropBoxData>();
+
+    const onCropMove = (props: CropperTypes.CropBoxData) => {
+        cropBoxData.current = props;
+    }
+    const onConfirm = () => {
+        cropBoxData.current && onCrop(cropBoxData.current);
+    }
+
+    const content = <Cropper imageSrc={imageSrc} onCropMove={onCropMove} />
+
     const footer = (<div className='flex justify-between gap-4'>
         <Button theme='secondary' className="text-sm px-0 py-0 w-full" onClick={onClose}>Cancel</Button>
-        <Button theme='primary' className="text-sm px-0 py-0 w-full" onClick={onCrop}>Confirm</Button>
+        <Button theme='primary' className="text-sm px-0 py-0 w-full" onClick={onConfirm}>Confirm</Button>
     </div>);
 
     return (
         <Modal
             ID='imageCrop'
-            className='min-w-[250px] max-w-[300px] m-auto mt-[200px]'
+            className='max-w-[300px] m-auto mt-[200px]'
             open={open}
             title='Crop your picture'
             content={content}
