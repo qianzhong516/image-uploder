@@ -50,6 +50,7 @@ export default function Home() {
         city='Vancouver'
         onUpdatePicture={handleUpdatePicture} />
       <UploadImageModal
+        currentProfileIcon={profileIcon}
         isOpen={isOpen}
         closeModal={closeModal}
         updateProfileIcon={updateProfileIcon} />

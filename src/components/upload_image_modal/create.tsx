@@ -15,6 +15,7 @@ const IMAGE_UPLOAD_LIMIT = 5;
 
 type CreateUploadImageModalProps = {
     isOpen: boolean,
+    currentProfileIcon: string,
     updateProfileIcon: (icon: string) => void,
     closeModal: () => void
 }
@@ -22,7 +23,7 @@ type CreateUploadImageModalProps = {
 export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> => {
     const ImageCropModal = createImageCropModal();
 
-    const Component = ({ isOpen, updateProfileIcon, closeModal }: CreateUploadImageModalProps) => {
+    const Component = ({ isOpen, currentProfileIcon, updateProfileIcon, closeModal }: CreateUploadImageModalProps) => {
         const [imageList, setImageList] = useImmer<ImageListProps>([]);
         const [hasFetchError, setHasFetchError] = useState(false);
         const [selectedOption, setSelectedOption] = useState('');
@@ -130,6 +131,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                                 title,
                                 totalSize,
                                 imgSrc,
+                                selected: false,
                                 onChangeSelection: (e) => setSelectedOption(e.target.value),
                                 openCropper,
                                 onDelete: createDeleteImageHandler(item.title)
@@ -182,9 +184,10 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         imgSrc: path,
                         onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
                             setSelectedOption(e.target.value),
+                        selected: currentProfileIcon === path,
                         openCropper,
                         onDelete: createDeleteImageHandler(title),
-                    })));
+                    }) as ImageItemCompleteProps));
                 } catch (_) {
                     setHasFetchError(true);
                 }
@@ -193,7 +196,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             if (isOpen) {
                 displayUploadedIcons();
             }
-        }, [createDeleteImageHandler, isOpen, openCropper, setImageList]);
+        }, [createDeleteImageHandler, currentProfileIcon, isOpen, openCropper, setImageList]);
 
         const index = imageList.findIndex(img => img.title === cropperImgTitle);
         const cropperImage = imageList[index];

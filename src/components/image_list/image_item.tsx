@@ -23,6 +23,7 @@ type ImageItemWrapperProps = ImageItemCommonProps & {
 export type ImageItemCompleteProps = ImageItemCommonProps & {
     state: 'complete',
     imgSrc: string,
+    selected: boolean,
     onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) => void,
     openCropper: (title: string) => void,
     onDelete: () => void
@@ -78,7 +79,7 @@ export default function ImageItem({
     switch (props.state) {
         case 'complete': {
             const thumbnail = <ProfileIcon src={props.imgSrc} size={80} className='rounded-md' />
-            const rightControl = <RadioButton name='image-item' value={title} className='absolute top-0 right-1' onChange={props.onChangeSelection} />;
+            const rightControl = <RadioButton name='image-item' value={title} className='absolute top-0 right-1' selected={props.selected} onChange={props.onChangeSelection} />;
             const bottomControl = <div className='flex gap-1 items-center'>
                 <Button theme='tertiary' prefixIcon={<CropIcon />} className='text-sm' onClick={() => props.openCropper(title)}>Crop image</Button> <span className='text-neutral-600 font-bold'>&sdot;</span>
                 <Button theme='tertiary' prefixIcon={<DeleteBinIcon />} className='text-sm' onClick={props.onDelete}>Delete</Button>
