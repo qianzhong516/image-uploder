@@ -9,12 +9,12 @@ type ImageCropModalProps = {
     open: boolean,
     imageSrc: string,
     onClose: () => void,
-    onCrop: (props: CropperTypes.CropBoxData) => void
+    onCrop: (cropData: CropperTypes.CropBoxData, cropRatio: number) => void
 }
 
 type CropperProps = {
     imageSrc: string,
-    onCropMove?: (props: CropperTypes.CropBoxData) => void,
+    onCropMove?: (cropData: CropperTypes.CropBoxData, cropRatio: number) => void,
 }
 
 const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
@@ -24,7 +24,15 @@ const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
         if (!cropper) {
             return;
         }
-        onCropMove?.(cropper.getCropBoxData());
+
+        const cropBoxData = cropper.getCropBoxData();
+        const canavsData = cropper.getCanvasData();
+        onCropMove?.({
+            left: cropBoxData.left - canavsData.left,
+            top: cropBoxData.top - canavsData.top,
+            width: cropBoxData.width,
+            height: cropBoxData.height,
+        }, canavsData.naturalWidth / canavsData.width);
     };
     const timer = useRef<NodeJS.Timeout | null>(null);
 
@@ -69,12 +77,14 @@ export default function ImageCropModal({
     onCrop
 }: ImageCropModalProps) {
     const cropBoxData = useRef<CropperTypes.CropBoxData>();
+    const cropRatioRef = useRef<number | null>(null);
 
-    const onCropMove = (props: CropperTypes.CropBoxData) => {
+    const onCropMove = (props: CropperTypes.CropBoxData, cropRatio: number) => {
         cropBoxData.current = props;
+        cropRatioRef.current = cropRatio;
     }
     const onConfirm = () => {
-        cropBoxData.current && onCrop(cropBoxData.current);
+        cropBoxData.current && onCrop(cropBoxData.current, cropRatioRef.current!);
     }
 
     const content = <Cropper imageSrc={imageSrc} onCropMove={onCropMove} />

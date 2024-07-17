@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from '@/axios';
 import { createImageCropModal } from '@/components/image_crop_modal/create';
 
+// TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 const IMAGE_UPLOAD_LIMIT = 5;
 
@@ -25,7 +26,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
         const [hasFetchError, setHasFetchError] = useState(false);
         const [selectedOption, setSelectedOption] = useState('');
         const [isCropperOpen, setIsCropperOpen] = useState(false);
-        const [cropperImgSrc, setCropperImgSrc] = useState('');
+        const [cropperImgTitle, setCropperImgTitle] = useState('');
 
         const handleOnConfirm = useCallback(async () => {
             closeModal();
@@ -57,9 +58,9 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             controller.abort('Cancel upload.');
         }, [setImageList]);
 
-        const openCropper = useCallback((imgSrc: string) => {
+        const openCropper = useCallback((title: string) => {
             setIsCropperOpen(true);
-            setCropperImgSrc(imgSrc);
+            setCropperImgTitle(title);
         }, []);
         const closeCropper = useCallback(() => setIsCropperOpen(false), []);
 
@@ -193,6 +194,8 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             }
         }, [createDeleteImageHandler, isOpen, openCropper, setImageList]);
 
+        const cropperImage = imageList.find(img => img.title === cropperImgTitle);
+
         return (
             <>
                 <UploadImageModal
@@ -204,10 +207,12 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                     onClose={closeModal}
                     onConfirm={handleOnConfirm}
                 />
-                <ImageCropModal
-                    imageSrc={cropperImgSrc}
-                    isOpen={isCropperOpen}
-                    closeModal={closeCropper} />
+                {cropperImage && cropperImage.state === 'complete' &&
+                    <ImageCropModal
+                        imageTitle={cropperImgTitle}
+                        imageSrc={cropperImage.imgSrc}
+                        isOpen={isCropperOpen}
+                        closeModal={closeCropper} />}
             </>
         )
     }
