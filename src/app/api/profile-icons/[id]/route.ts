@@ -30,7 +30,6 @@ export async function PUT(
   const ext = path.extname(fileId);
   const fileName = path.parse(fileId).name;
   const match = fileName.match(/(.+)-cropped-(\d)$/);
-  console.log({ match });
   // fileName, fileName-cropped-1, fileName-cropped-2, ...
   let newTitle = '';
   if (!match) {
@@ -49,7 +48,9 @@ export async function PUT(
     const input = await readFile(inputPath);
     const instance = sharp(input).extract(cropData);
     const toFile = promisify(instance.toFile.bind(instance));
-    await toFile(outputPath);
+    const croppedFile = (await toFile(outputPath)) as unknown as {
+      size: number;
+    };
 
     // delete the old file
     await unlink(inputPath);
@@ -82,7 +83,7 @@ export async function PUT(
       {
         title: newTitle,
         path: `/uploads/${userId}/${newTitle}`,
-        totalSize: 0, // TODO:,
+        totalSizeInBytes: croppedFile.size,
       },
       {
         new: true,
