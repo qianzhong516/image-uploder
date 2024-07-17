@@ -9,7 +9,8 @@ type CreateImageCropModalProps = {
     imageTitle: string,
     imageSrc: string,
     isOpen: boolean,
-    updateImage: (updatedIcon: Pick<ImageItemCompleteProps, 'title' | 'totalSize' | 'imgSrc'>) => void
+    updateProfileIcon: (icon: string) => void,
+    updateImage: (updatedIcon: Pick<ImageItemCompleteProps, 'title' | 'totalSize' | 'imgSrc'>) => void,
     closeModal: () => void
 }
 
@@ -21,6 +22,7 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
         imageTitle,
         imageSrc,
         isOpen,
+        updateProfileIcon,
         updateImage,
         closeModal
     }: CreateImageCropModalProps) => {
@@ -31,12 +33,14 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
                     cropData: props,
                     cropRatio
                 });
-                const { path, title, totalSizeInBytes }: ProfileIcons = res.data.message;
+                const { profileIcon, isPrimaryIconUpdated } = res.data.message;
+                const { path, title, totalSizeInBytes }: ProfileIcons = profileIcon
                 updateImage({
                     title: title,
                     totalSize: getTotalSize(totalSizeInBytes),
                     imgSrc: path,
                 });
+                isPrimaryIconUpdated && updateProfileIcon(path);
                 // TODO: toast the success message
             } catch (err) {
                 console.log(err)

@@ -219,6 +219,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 />
                 {cropperImage && cropperImage.state === 'complete' &&
                     <ImageCropModal
+                        updateProfileIcon={updateProfileIcon}
                         updateImage={handleUpdateImage}
                         imageTitle={cropperImgTitle}
                         imageSrc={cropperImage.imgSrc}
