@@ -54,10 +54,13 @@ export default function Modal({
     const currentKey = modals.at(-1);
 
     useEffect(() => {
-        updateModals(modals => Array.from(new Set([...modals, id])));
+        // we don't want a modal key gets added when the modal is not open
+        if (open) {
+            updateModals(modals => Array.from(new Set([...modals, id])));
+        }
 
         return () => updateModals(modals => modals.filter(m => m !== id));
-    }, [id, updateModals]);
+    }, [id, open, updateModals]);
 
     return currentKey === id && open && createPortal(
         <Backdrop>
