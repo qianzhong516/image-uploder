@@ -20,13 +20,15 @@ type ImageItemWrapperProps = ImageItemCommonProps & {
     bottomControl: React.ReactNode
 }
 
-export type ImageItemProps = ImageItemCommonProps & ({
+export type ImageItemCompleteProps = ImageItemCommonProps & {
     state: 'complete',
     imgSrc: string,
     onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) => void,
     openCropper: (title: string) => void,
     onDelete: () => void
-} | {
+}
+
+export type ImageItemProps = ImageItemCompleteProps | ImageItemCommonProps & ({
     state: 'load-success',
     imgSrc: string,
     onDelete: () => void,

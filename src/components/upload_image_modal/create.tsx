@@ -7,6 +7,7 @@ import { AxiosError, AxiosProgressEvent } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import axios from '@/axios';
 import { createImageCropModal } from '@/components/image_crop_modal/create';
+import { ImageItemCompleteProps } from '../image_list/image_item';
 
 // TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
@@ -177,7 +178,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         state: 'complete',
                         id: title,
                         title,
-                        totalSize: totalSizeInBytes,
+                        totalSize: getTotalSize(totalSizeInBytes),
                         imgSrc: path,
                         onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
                             setSelectedOption(e.target.value),
@@ -194,7 +195,16 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             }
         }, [createDeleteImageHandler, isOpen, openCropper, setImageList]);
 
-        const cropperImage = imageList.find(img => img.title === cropperImgTitle);
+        const index = imageList.findIndex(img => img.title === cropperImgTitle);
+        const cropperImage = imageList[index];
+        const handleUpdateImage = useCallback((updatedImage: Pick<ImageItemCompleteProps, 'title' | 'totalSize' | 'imgSrc'>) => {
+            setImageList(draft => {
+                draft[index] = {
+                    ...draft[index],
+                    ...updatedImage
+                }
+            });
+        }, [index, setImageList]);
 
         return (
             <>
@@ -209,6 +219,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 />
                 {cropperImage && cropperImage.state === 'complete' &&
                     <ImageCropModal
+                        updateImage={handleUpdateImage}
                         imageTitle={cropperImgTitle}
                         imageSrc={cropperImage.imgSrc}
                         isOpen={isCropperOpen}
