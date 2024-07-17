@@ -6,6 +6,7 @@ import { ProfileIcons } from '@/models/ProfileIcon';
 import { AxiosError, AxiosProgressEvent } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import axios from '@/axios';
+import { createImageCropModal } from '@/components/image_crop_modal/create';
 
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 const IMAGE_UPLOAD_LIMIT = 5;
@@ -17,11 +18,14 @@ type CreateUploadImageModalProps = {
 }
 
 export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> => {
+    const ImageCropModal = createImageCropModal();
 
     const Component = ({ isOpen, updateProfileIcon, closeModal }: CreateUploadImageModalProps) => {
         const [imageList, setImageList] = useImmer<ImageListProps>([]);
         const [hasFetchError, setHasFetchError] = useState(false);
         const [selectedOption, setSelectedOption] = useState('');
+        const [isCropperOpen, setIsCropperOpen] = useState(false);
+        const [cropperImgSrc, setCropperImgSrc] = useState('');
 
         const handleOnConfirm = useCallback(async () => {
             closeModal();
@@ -52,6 +56,12 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             setImageList(draft => draft.filter(d => d.title !== fileName));
             controller.abort('Cancel upload.');
         }, [setImageList]);
+
+        const openCropper = useCallback((imgSrc: string) => {
+            setIsCropperOpen(true);
+            setCropperImgSrc(imgSrc);
+        }, []);
+        const closeCropper = useCallback(() => setIsCropperOpen(false), []);
 
         const handleUploadImage = async (files: File[]) => {
 
@@ -119,7 +129,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                                 totalSize,
                                 imgSrc,
                                 onChangeSelection: (e) => setSelectedOption(e.target.value),
-                                onCropImage: () => { }, // TODO:
+                                openCropper,
                                 onDelete: createDeleteImageHandler(item.title)
                             };
                         })
@@ -170,7 +180,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         imgSrc: path,
                         onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
                             setSelectedOption(e.target.value),
-                        onCropImage: () => { }, // TODO:
+                        openCropper,
                         onDelete: createDeleteImageHandler(title),
                     })));
                 } catch (_) {
@@ -181,17 +191,25 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             if (isOpen) {
                 displayUploadedIcons();
             }
-        }, [createDeleteImageHandler, isOpen, setImageList]);
+        }, [createDeleteImageHandler, isOpen, openCropper, setImageList]);
 
-        return <UploadImageModal
-            open={isOpen}
-            allowMutiple={true}
-            imageList={Array.from(imageList.values())}
-            error={imageList.length >= IMAGE_UPLOAD_LIMIT ? 'reachedLimit' : hasFetchError ? 'dataFetch' : undefined}
-            uploadFiles={handleUploadImage}
-            onClose={closeModal}
-            onConfirm={handleOnConfirm}
-        />
+        return (
+            <>
+                <UploadImageModal
+                    open={isOpen}
+                    allowMutiple={true}
+                    imageList={Array.from(imageList.values())}
+                    error={imageList.length >= IMAGE_UPLOAD_LIMIT ? 'reachedLimit' : hasFetchError ? 'dataFetch' : undefined}
+                    uploadFiles={handleUploadImage}
+                    onClose={closeModal}
+                    onConfirm={handleOnConfirm}
+                />
+                <ImageCropModal
+                    imageSrc={cropperImgSrc}
+                    isOpen={isCropperOpen}
+                    closeModal={closeCropper} />
+            </>
+        )
     }
 
     return Component;

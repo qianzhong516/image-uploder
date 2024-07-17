@@ -51,6 +51,7 @@ const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
     return (
         <CropperImpl
             src={imageSrc}
+            minContainerHeight={150}
             aspectRatio={1}
             guides={false}
             crop={onCrop}

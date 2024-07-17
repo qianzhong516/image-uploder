@@ -22,8 +22,9 @@ export const InitialState: Story = {
     args: {
         state: 'complete',
         imgSrc: '/avatar-image-item.png',
-        onCropImage: fn(),
-        onDelete: fn()
+        openCropper: fn(),
+        onDelete: fn(),
+        onChangeSelection: fn()
     },
 };
 
