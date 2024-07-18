@@ -3,7 +3,8 @@ import CloseIcon from '@/components/icons/close';
 import { createPortal } from 'react-dom';
 import { twMerge } from 'tailwind-merge';
 import { ModalContext, ModalKey } from './modalContext';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, } from 'react';
+import { Transition, TransitionChild } from '@headlessui/react'
 
 type ModalProps = {
     ID: ModalKey,
@@ -39,7 +40,7 @@ export function ModalImpl({
 }
 
 const Backdrop = ({ children }: { children: React.ReactNode }) =>
-    <div className='fixed inset-0 w-full h-full bg-neutral-950/60'>{children}</div>;
+    <div className='fixed inset-0 w-full h-full bg-neutral-950/40 backdrop-blur-sm flex justify-center'>{children}</div>;
 
 export default function Modal({
     container,
@@ -62,9 +63,32 @@ export default function Modal({
         return () => updateModals(modals => modals.filter(m => m !== id));
     }, [id, open, updateModals]);
 
-    return currentKey === id && open && createPortal(
-        <Backdrop>
-            <ModalImpl {...props} />
-        </Backdrop>, container
-    );
+    return currentKey === id && open &&
+        createPortal(
+            <Transition show={open} appear={true}>
+                <TransitionChild
+                    enter="ease-in-out"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-out"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0">
+                    <div className='transition duration-[250ms]'>
+                        <Backdrop >
+                            <TransitionChild
+                                enter="ease-in-out"
+                                enterFrom="scale-0"
+                                enterTo="scale-100"
+                                leave="ease-out"
+                                leaveFrom="scale-100"
+                                leaveTo="scale-0">
+                                <div className='transition duration-[250ms]'>
+                                    <ModalImpl {...props} />
+                                </div>
+                            </TransitionChild>
+                        </Backdrop>
+                    </div>
+                </TransitionChild>
+            </Transition>,
+            container);
 }
