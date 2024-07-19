@@ -28,7 +28,7 @@ export const View: Story = {
         open: true,
         allowMutiple: true,
         imageList: [
-            { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), openCropper: fn(), onChangeSelection: fn() },
+            { id: '1', state: 'complete', title: 'Image1', totalSize: '200kb', imgSrc: '/avatar-image-item.png', onDelete: fn(), openCropper: fn(), onChangeSelection: fn(), selected: false },
         ],
         uploadFiles: fn(),
         onClose: fn(),
@@ -87,6 +87,7 @@ export const View: Story = {
                             title: item.title,
                             totalSize: item.totalSize,
                             imgSrc: item.imgSrc,
+                            selected: false,
                             openCropper: fn(),
                             onDelete: fn(),
                             onChangeSelection: fn()
