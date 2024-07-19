@@ -43,11 +43,9 @@ const Backdrop = ({ children }: { children: React.ReactNode }) =>
     <div className='fixed inset-0 w-full h-full bg-neutral-950/40 backdrop-blur-sm flex justify-center'>{children}</div>;
 
 export default function Modal({
-    container,
     open,
     ...props
 }: ModalProps & {
-    container: HTMLElement,
     open: boolean,
 }) {
     const { modals, updateModals } = useContext(ModalContext);
@@ -90,5 +88,5 @@ export default function Modal({
                     </div>
                 </TransitionChild>
             </Transition>,
-            container);
+            document.body);
 }

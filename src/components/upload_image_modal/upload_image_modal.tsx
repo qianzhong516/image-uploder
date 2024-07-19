@@ -70,7 +70,6 @@ export default function UploadImageModal({
         ID='uploadImage'
         open={open}
         onClose={onClose}
-        container={document.body}
         title='Upload image(s)'
         subtitle='You may upload up to 5 images'
         className='min-w-[600px] max-w-[700px] m-auto mt-[200px]'

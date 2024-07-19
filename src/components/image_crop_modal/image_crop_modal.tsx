@@ -101,7 +101,6 @@ export default function ImageCropModal({
             open={open}
             title='Crop your picture'
             content={content}
-            container={document.body}
             footer={footer}
             onClose={onClose} />
     );
