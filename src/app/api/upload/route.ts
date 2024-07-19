@@ -49,8 +49,10 @@ export async function POST(req: NextRequest) {
       process.cwd(),
       `public/uploads/${USER_ID}/`
     );
+    console.log(dir, 'if dir exists: ', existsSync(dir));
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
+      console.log('creating the directory');
     }
 
     await writeFile(path.resolve(dir, file.name), buffer);
