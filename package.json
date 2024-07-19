@@ -11,6 +11,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.616.0",
     "@headlessui/react": "^2.1.2",
     "axios": "^1.7.2",
     "immer": "^10.1.1",
