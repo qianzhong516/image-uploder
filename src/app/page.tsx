@@ -11,21 +11,21 @@ const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
-  const [profileIcon, setProfileIcon] = useState('');
+  const [primaryIcon, setPrimaryIcon] = useState('');
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);
-  const updateProfileIcon = useCallback((icon: string) => {
-    setProfileIcon(icon);
+  const updatePrimaryIcon = useCallback((icon: string) => {
+    setPrimaryIcon(icon);
   }, []);
 
   useEffect(() => {
     async function displayUserProfileIcon() {
       try {
         const res = await axios.get(`/api/user/${CURRENT_USER_ID}`);
-        const profileIcon = res.data.message.profileIcon;
+        const profileIcon = res.data.message.icon;
         if (profileIcon) {
-          setProfileIcon(profileIcon);
+          setPrimaryIcon(profileIcon.path);
         }
       } catch (err) {
         console.log(err);
@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <div className='w-full max-w-[600px] mt-[200px] mx-auto'>
       <ProfileBanner
-        profileIconSrc={profileIcon}
+        profileIconSrc={primaryIcon}
         name='Jack Smith'
         handler='kingjack'
         title='Senior Product Designer'
@@ -50,10 +50,10 @@ export default function Home() {
         city='Vancouver'
         onUpdatePicture={handleUpdatePicture} />
       <UploadImageModal
-        currentProfileIcon={profileIcon}
+        currentProfileIcon={primaryIcon}
         isOpen={isOpen}
         closeModal={closeModal}
-        updateProfileIcon={updateProfileIcon} />
+        updatePrimaryIcon={updatePrimaryIcon} />
     </div>
   );
 }

@@ -16,32 +16,30 @@ const IMAGE_UPLOAD_LIMIT = 5;
 type CreateUploadImageModalProps = {
     isOpen: boolean,
     currentProfileIcon: string,
-    updateProfileIcon: (icon: string) => void,
+    updatePrimaryIcon: (icon: string) => void,
     closeModal: () => void
 }
 
 export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> => {
     const ImageCropModal = createImageCropModal();
 
-    const Component = ({ isOpen, currentProfileIcon, updateProfileIcon, closeModal }: CreateUploadImageModalProps) => {
+    const Component = ({ isOpen, currentProfileIcon, updatePrimaryIcon, closeModal }: CreateUploadImageModalProps) => {
         const [imageList, setImageList] = useImmer<ImageListProps>([]);
         const [hasFetchError, setHasFetchError] = useState(false);
-        const [selectedOption, setSelectedOption] = useState('');
+        const [selectedIconId, setSelectedIconId] = useState('');
         const [isCropperOpen, setIsCropperOpen] = useState(false);
         const [cropperImgTitle, setCropperImgTitle] = useState('');
 
         const handleOnConfirm = useCallback(async () => {
             closeModal();
             const res = await axios.put(`api/user/${CURRENT_USER_ID}`, {
-                data: {
-                    profileIconTitle: selectedOption
-                }
+                iconId: selectedIconId
             });
-            const profileIcon = res.data.message.profileIcon;
-            if (profileIcon) {
-                updateProfileIcon(profileIcon);
+            const { icon }: { icon: ProfileIcons } = res.data.message;
+            if (icon) {
+                updatePrimaryIcon(icon.path);
             }
-        }, [closeModal, selectedOption, updateProfileIcon]);
+        }, [closeModal, selectedIconId, updatePrimaryIcon]);
 
         const createDeleteImageHandler = useCallback((id: string) => async () => {
             setImageList(draft => draft.filter(d => (d.state === 'complete' || d.state === 'load-success') && d.id !== id));
@@ -125,7 +123,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                                 totalSize,
                                 imgSrc,
                                 selected: false,
-                                onChangeSelection: (e) => setSelectedOption(e.target.value),
+                                onChangeSelection: (e) => setSelectedIconId(e.target.value),
                                 openCropper,
                                 onDelete: createDeleteImageHandler(fileId)
                             };
@@ -175,7 +173,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         totalSize: getTotalSize(totalSizeInBytes),
                         imgSrc: path,
                         onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
-                            setSelectedOption(e.target.value),
+                            setSelectedIconId(e.target.value),
                         selected: currentProfileIcon === path,
                         openCropper,
                         onDelete: createDeleteImageHandler(_id),
@@ -214,7 +212,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 />
                 {cropperImage && cropperImage.state === 'complete' &&
                     <ImageCropModal
-                        updateProfileIcon={updateProfileIcon}
+                        updatePrimaryIcon={updatePrimaryIcon}
                         updateImage={handleUpdateImage}
                         imageTitle={cropperImgTitle}
                         imageSrc={cropperImage.imgSrc}

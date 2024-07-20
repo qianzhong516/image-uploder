@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
 
 export interface UserProfiles extends mongoose.Document {
-  profileIcon: string; // file path string
+  profileIcon: typeof mongoose.Schema.ObjectId; // [foreign key]: userid
 }
 
 const UserProfileSchema = new mongoose.Schema<UserProfiles>({
   profileIcon: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    required: false,
+    ref: 'ProfileIcon',
   },
 });
 

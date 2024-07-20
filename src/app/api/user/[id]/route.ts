@@ -16,9 +16,11 @@ export async function GET(
       _id: userId,
     });
 
+    const icon = await ProfileIcon.findById(userProfile.profileIcon);
+
     return NextResponse.json(
       {
-        message: userProfile,
+        message: { icon },
       },
       { status: 200 }
     );
@@ -39,14 +41,21 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const { id: userId } = params;
-  const { data } = await req.json();
+  const { iconId } = await req.json();
+
+  if (!iconId) {
+    return NextResponse.json(
+      {
+        message: 'Icon is not specified.',
+      },
+      { status: 400 }
+    );
+  }
 
   try {
     await dbConnect();
 
-    const icon = await ProfileIcon.findOne({
-      title: data.profileIconTitle,
-    });
+    const icon = await ProfileIcon.findById(iconId);
 
     if (!icon) {
       return NextResponse.json(
@@ -57,12 +66,12 @@ export async function PUT(
       );
     }
 
-    const userProfile = await UserProfile.findOneAndUpdate(
+    await UserProfile.findOneAndUpdate(
       {
         _id: userId,
       },
       {
-        profileIcon: icon.path,
+        profileIcon: iconId,
       },
       {
         new: true, // return the updated result
@@ -71,7 +80,7 @@ export async function PUT(
 
     return NextResponse.json(
       {
-        message: userProfile,
+        message: { icon },
       },
       { status: 200 }
     );
