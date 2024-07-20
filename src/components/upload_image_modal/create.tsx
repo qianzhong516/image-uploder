@@ -43,13 +43,9 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             }
         }, [closeModal, selectedOption, updateProfileIcon]);
 
-        const createDeleteImageHandler = useCallback((fileName: string) => async () => {
-            setImageList(draft => draft.filter(d => d.title !== fileName));
-            await axios.delete(`api/profile-icons/${fileName}`, {
-                data: {
-                    uploadedBy: CURRENT_USER_ID
-                }
-            }).catch(err => {
+        const createDeleteImageHandler = useCallback((id: string) => async () => {
+            setImageList(draft => draft.filter(d => (d.state === 'complete' || d.state === 'load-success') && d.id !== id));
+            await axios.delete(`api/profile-icons/${id}`).catch(err => {
                 // TODO: show the error in a toast
                 console.log(err);
             });
@@ -81,7 +77,6 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 setImageList(draft => {
                     draft[i] = {
                         state: 'loading',
-                        id: title,
                         title,
                         imgSrc,
                         totalSize,
@@ -110,31 +105,29 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 }
 
                 axios.post('/api/upload', formData, config).then(res => {
+                    const fileId = res.data.message.id;
                     setImageList(draft => {
-                        const item = draft[i]
                         draft[i] = {
                             state: 'load-success',
-                            id: title, // use titles as id
+                            id: fileId,
                             title,
                             totalSize,
                             imgSrc,
-                            onDelete: createDeleteImageHandler(item.title)
+                            onDelete: createDeleteImageHandler(fileId)
                         }
                     });
-
                     setTimeout(() => {
                         setImageList(draft => {
-                            const item = draft[i];
                             draft[i] = {
                                 state: 'complete',
-                                id: title,
+                                id: fileId,
                                 title,
                                 totalSize,
                                 imgSrc,
                                 selected: false,
                                 onChangeSelection: (e) => setSelectedOption(e.target.value),
                                 openCropper,
-                                onDelete: createDeleteImageHandler(item.title)
+                                onDelete: createDeleteImageHandler(fileId)
                             };
                         })
                     }, 2000);
@@ -155,7 +148,6 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
 
                             draft[i] = {
                                 state: 'error',
-                                id: title,
                                 title,
                                 totalSize,
                                 onDelete: () => setImageList(draft => draft.filter(d => d.title !== title)),
@@ -176,9 +168,9 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         }
                     });
                     const icons = res.data.message || [];
-                    setImageList(icons.map(({ title, totalSizeInBytes, path }: ProfileIcons, i: number) => ({
+                    setImageList(icons.map(({ _id, title, totalSizeInBytes, path }: ProfileIcons) => ({
                         state: 'complete',
-                        id: title,
+                        id: _id,
                         title,
                         totalSize: getTotalSize(totalSizeInBytes),
                         imgSrc: path,
@@ -186,7 +178,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                             setSelectedOption(e.target.value),
                         selected: currentProfileIcon === path,
                         openCropper,
-                        onDelete: createDeleteImageHandler(title),
+                        onDelete: createDeleteImageHandler(_id),
                     }) as ImageItemCompleteProps));
                 } catch (_) {
                     setHasFetchError(true);

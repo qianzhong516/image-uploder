@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     });
     await client.send(command);
 
-    await ProfileIcon.create({
+    const icon = await ProfileIcon.create({
       title: file.name,
       totalSizeInBytes: file.size,
       path: key,
@@ -64,7 +64,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: 'File uploaded' },
+      {
+        message: {
+          id: icon._id,
+        },
+      },
       { status: 200 }
     );
   } catch (error) {

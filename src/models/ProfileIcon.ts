@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export interface ProfileIcons extends mongoose.Document {
+  _id: string;
   title: string;
   totalSizeInBytes: number;
   path: string;

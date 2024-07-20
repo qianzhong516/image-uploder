@@ -5,6 +5,8 @@ import ProfileIcon from '@/models/ProfileIcon';
 import sharp from 'sharp';
 import { promisify } from 'util';
 import UserProfile from '@/models/UserProfile';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import client from '../../client';
 
 // profile-icons/[id]
 export async function PUT(
@@ -117,18 +119,21 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const fileId = params.id;
-  const data = await req.json();
-  const { uploadedBy: userId } = data;
 
   try {
-    await unlink(
-      path.resolve(
-        process.cwd(),
-        `public/uploads/${userId}/${fileId}`
-      )
-    );
+    const icon = await ProfileIcon.findById(fileId);
+
+    if (!icon) {
+      throw new Error('File does not exist.');
+    }
+
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: icon.path,
+    });
+    await client.send(command);
     await ProfileIcon.deleteOne({
-      title: fileId,
+      _id: fileId,
     });
 
     return NextResponse.json(

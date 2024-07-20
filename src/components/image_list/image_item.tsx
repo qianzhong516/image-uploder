@@ -22,6 +22,7 @@ type ImageItemWrapperProps = ImageItemCommonProps & {
 
 export type ImageItemCompleteProps = ImageItemCommonProps & {
     state: 'complete',
+    id: string,
     imgSrc: string,
     selected: boolean,
     onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) => void,
@@ -31,6 +32,7 @@ export type ImageItemCompleteProps = ImageItemCommonProps & {
 
 export type ImageItemProps = ImageItemCompleteProps | ImageItemCommonProps & ({
     state: 'load-success',
+    id: string,
     imgSrc: string,
     onDelete: () => void,
 } | {
