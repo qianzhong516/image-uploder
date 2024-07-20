@@ -3,8 +3,7 @@ import ImageCropModal from './image_crop_modal';
 import CropperTypes from 'cropperjs';
 import { ImageItemCompleteProps } from '../image_list/image_item';
 import { ProfileIcons } from '@/models/ProfileIcon';
-import { getTotalSize } from '@/utils';
-import { imageConfigDefault } from 'next/dist/shared/lib/image-config';
+import { getImageSource, getTotalSize } from '@/utils';
 
 type CreateImageCropModalProps = {
     imageTitle: string,
@@ -50,17 +49,10 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
             }
         }
 
-        // generates the url manually here because we aren't using the next/image component in cropperjs,
-        // next/image generates the url for images automatically. It goes through a loader,
-        // @see: https://nextjs.org/docs/pages/building-your-application/optimizing/images#loaders.
         let src = imageSrc;
         const isDataURL = (url: string) => /^data:image\/(jpeg|jpg|png);base64,/.test(url);
         if (!isDataURL(imageSrc)) {
-            // mimic next/image's url pattern. 
-            // @see: https://github.com/vercel/next.js/blob/0c3b063d09dc7ddcf9e308f2d2848f4c558c748b/packages/next/src/shared/lib/image-loader.ts#L60-L67.
-            const configPath = imageConfigDefault.path;
-            // w has to satisfy imageConfigDefault.imageSizes
-            src = `${configPath}?url=${encodeURIComponent(imageSrc)}&w=${96}&q=${75}`;
+            src = getImageSource(src);
         }
 
         return <ImageCropModal

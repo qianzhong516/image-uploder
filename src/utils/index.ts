@@ -30,3 +30,17 @@ export async function getImgSrc(files: File[]) {
     });
   });
 }
+
+export function getFileExt(fileName: string) {
+  const match = fileName.match(/.(png|jpeg|jpg)$/);
+
+  if (!match) {
+    throw new Error('The file has no matched extension.');
+  }
+
+  return match[1];
+}
+
+export function getImageSource(relativePath: string) {
+  return `https://imageuploader516.s3.eu-north-1.amazonaws.com/${relativePath}`;
+}
