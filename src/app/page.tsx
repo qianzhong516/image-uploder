@@ -5,19 +5,17 @@ import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import axios from '@/axios';
 import { createUploadImageModal } from '@/components/upload_image_modal/create';
+import { ProfileIcons } from '@/models/ProfileIcon';
 
 // TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
-  const [primaryIcon, setPrimaryIcon] = useState('');
+  const [primaryIcon, setPrimaryIcon] = useState<ProfileIcons>();
 
   const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);
-  const updatePrimaryIcon = useCallback((icon: string) => {
-    setPrimaryIcon(icon);
-  }, []);
 
   useEffect(() => {
     async function displayUserProfileIcon() {
@@ -25,7 +23,7 @@ export default function Home() {
         const res = await axios.get(`/api/user/${CURRENT_USER_ID}`);
         const profileIcon = res.data.message.icon;
         if (profileIcon) {
-          setPrimaryIcon(profileIcon.path);
+          setPrimaryIcon(profileIcon);
         }
       } catch (err) {
         console.log(err);
@@ -40,7 +38,7 @@ export default function Home() {
   return (
     <div className='w-full max-w-[600px] mt-[200px] mx-auto'>
       <ProfileBanner
-        profileIconSrc={primaryIcon}
+        profileIconSrc={primaryIcon?.path || ''}
         name='Jack Smith'
         handler='kingjack'
         title='Senior Product Designer'
@@ -53,7 +51,7 @@ export default function Home() {
         currentProfileIcon={primaryIcon}
         isOpen={isOpen}
         closeModal={closeModal}
-        updatePrimaryIcon={updatePrimaryIcon} />
+        updatePrimaryIcon={setPrimaryIcon} />
     </div>
   );
 }

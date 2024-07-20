@@ -6,11 +6,11 @@ import { ProfileIcons } from '@/models/ProfileIcon';
 import { getImageSource, getTotalSize } from '@/utils';
 
 type CreateImageCropModalProps = {
-    imageTitle: string,
-    imageSrc: string,
+    imgId: string,
+    imgSrc: string,
     isOpen: boolean,
-    updatePrimaryIcon: (icon: string) => void,
-    updateImage: (updatedIcon: Pick<ImageItemCompleteProps, 'title' | 'totalSize' | 'imgSrc'>) => void,
+    updatePrimaryIcon?: (icon: ProfileIcons) => void,
+    updateImage: (updatedIcon: Pick<ImageItemCompleteProps, 'totalSize' | 'imgSrc'>) => void,
     closeModal: () => void
 }
 
@@ -19,8 +19,8 @@ const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
 export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
     const Component = ({
-        imageTitle,
-        imageSrc,
+        imgId,
+        imgSrc,
         isOpen,
         updatePrimaryIcon,
         updateImage,
@@ -28,19 +28,19 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
     }: CreateImageCropModalProps) => {
         const onCrop = async (props: CropperTypes.CropBoxData, cropRatio: number) => {
             try {
-                const res = await axios.put(`api/profile-icons/${imageTitle}`, {
+                const res = await axios.put(`api/profile-icons/${imgId}`, {
                     uploadedBy: CURRENT_USER_ID,
                     cropData: props,
                     cropRatio
                 });
-                const { profileIcon, isPrimaryIconUpdated } = res.data.message;
-                const { path, title, totalSizeInBytes }: ProfileIcons = profileIcon
+                const { profileIcon } = res.data.message;
+                const { totalSize, path }: { totalSize: number, path: string } = profileIcon
                 updateImage({
-                    title: title,
-                    totalSize: getTotalSize(totalSizeInBytes),
+                    totalSize: getTotalSize(totalSize),
                     imgSrc: path,
                 });
-                isPrimaryIconUpdated && updatePrimaryIcon(path);
+                // @ts-ignore 
+                updatePrimaryIcon?.(prev => ({ ...prev, path }));
                 // TODO: toast the success message
             } catch (err) {
                 console.log(err)
@@ -49,15 +49,15 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
             }
         }
 
-        let src = imageSrc;
+        let src = imgSrc;
         const isDataURL = (url: string) => /^data:image\/(jpeg|jpg|png);base64,/.test(url);
-        if (!isDataURL(imageSrc)) {
+        if (!isDataURL(imgSrc)) {
             src = getImageSource(src);
         }
 
         return <ImageCropModal
             open={isOpen}
-            imageSrc={src}
+            imgSrc={src}
             onClose={closeModal}
             onCrop={onCrop} />
     }

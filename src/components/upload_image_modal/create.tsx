@@ -15,8 +15,8 @@ const IMAGE_UPLOAD_LIMIT = 5;
 
 type CreateUploadImageModalProps = {
     isOpen: boolean,
-    currentProfileIcon: string,
-    updatePrimaryIcon: (icon: string) => void,
+    currentProfileIcon?: ProfileIcons,
+    updatePrimaryIcon: (icon: ProfileIcons) => void,
     closeModal: () => void
 }
 
@@ -28,7 +28,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
         const [hasFetchError, setHasFetchError] = useState(false);
         const [selectedIconId, setSelectedIconId] = useState('');
         const [isCropperOpen, setIsCropperOpen] = useState(false);
-        const [cropperImgTitle, setCropperImgTitle] = useState('');
+        const [cropperImgId, setCropperImgId] = useState('');
 
         const handleOnConfirm = useCallback(async () => {
             closeModal();
@@ -37,7 +37,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             });
             const { icon }: { icon: ProfileIcons } = res.data.message;
             if (icon) {
-                updatePrimaryIcon(icon.path);
+                updatePrimaryIcon(icon);
             }
         }, [closeModal, selectedIconId, updatePrimaryIcon]);
 
@@ -54,9 +54,9 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             controller.abort('Cancel upload.');
         }, [setImageList]);
 
-        const openCropper = useCallback((title: string) => {
+        const openCropper = useCallback((id: string) => {
             setIsCropperOpen(true);
-            setCropperImgTitle(title);
+            setCropperImgId(id);
         }, []);
         const closeCropper = useCallback(() => setIsCropperOpen(false), []);
 
@@ -174,7 +174,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         imgSrc: path,
                         onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
                             setSelectedIconId(e.target.value),
-                        selected: currentProfileIcon === path,
+                        selected: currentProfileIcon?.path === path,
                         openCropper,
                         onDelete: createDeleteImageHandler(_id),
                     }) as ImageItemCompleteProps));
@@ -186,11 +186,11 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             if (isOpen) {
                 displayUploadedIcons();
             }
-        }, [createDeleteImageHandler, currentProfileIcon, isOpen, openCropper, setImageList]);
+        }, [createDeleteImageHandler, isOpen, currentProfileIcon?.path, openCropper, setImageList]);
 
-        const index = imageList.findIndex(img => img.title === cropperImgTitle);
+        const index = imageList.findIndex(img => img.state === 'complete' && img.id === cropperImgId);
         const cropperImage = imageList[index];
-        const handleUpdateImage = useCallback((updatedImage: Pick<ImageItemCompleteProps, 'title' | 'totalSize' | 'imgSrc'>) => {
+        const handleUpdateImage = useCallback((updatedImage: Pick<ImageItemCompleteProps, 'totalSize' | 'imgSrc'>) => {
             setImageList(draft => {
                 draft[index] = {
                     ...draft[index],
@@ -212,11 +212,11 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 />
                 {cropperImage && cropperImage.state === 'complete' &&
                     <ImageCropModal
-                        updatePrimaryIcon={updatePrimaryIcon}
-                        updateImage={handleUpdateImage}
-                        imageTitle={cropperImgTitle}
-                        imageSrc={cropperImage.imgSrc}
                         isOpen={isCropperOpen}
+                        imgId={cropperImgId}
+                        imgSrc={cropperImage.imgSrc}
+                        updatePrimaryIcon={cropperImage.id === currentProfileIcon?.path ? updatePrimaryIcon : undefined}
+                        updateImage={handleUpdateImage}
                         closeModal={closeCropper} />}
             </>
         )

@@ -6,6 +6,7 @@ import dbConnect from '@/lib/dbconnect';
 import client from '../client';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { v1 as uuid } from 'uuid';
+import { getErrorResponse } from '../utils';
 
 // TODO: remove this later
 const USER_ID = '66882ac39085ad43fb32ce05';
@@ -15,10 +16,7 @@ export async function POST(req: NextRequest) {
   const file = formData.get('file') as unknown as File;
 
   if (!file) {
-    return NextResponse.json(
-      { error: 'File missing' },
-      { status: 500 }
-    );
+    return getErrorResponse('File missing', 500);
   }
 
   const sizeLimit = z.number().max(1024 * 1024 * 5, {
@@ -34,10 +32,7 @@ export async function POST(req: NextRequest) {
     formatLimit.parse(file.name);
   } catch (err) {
     if (err instanceof ZodError) {
-      return NextResponse.json(
-        { message: err.issues[0].message },
-        { status: 400 }
-      );
+      return getErrorResponse(err.issues[0].message, 400);
     }
   }
 
@@ -73,12 +68,9 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     console.log(error);
-    return NextResponse.json(
-      {
-        message:
-          'An unexpected error occurred during the upload. Please contact support if the issue persists.',
-      },
-      { status: 500 }
+    return getErrorResponse(
+      'An unexpected error occurred during the upload. Please contact support if the issue persists.',
+      500
     );
   }
 }

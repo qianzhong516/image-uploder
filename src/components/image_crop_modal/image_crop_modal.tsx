@@ -7,17 +7,17 @@ import CropperTypes from 'cropperjs';
 
 type ImageCropModalProps = {
     open: boolean,
-    imageSrc: string,
+    imgSrc: string,
     onClose: () => void,
     onCrop: (cropData: CropperTypes.CropBoxData, cropRatio: number) => void
 }
 
 type CropperProps = {
-    imageSrc: string,
+    imgSrc: string,
     onCropMove?: (cropData: CropperTypes.CropBoxData, cropRatio: number) => void,
 }
 
-const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
+const Cropper = ({ imgSrc, onCropMove }: CropperProps) => {
     const cropperRef = useRef<ReactCropperElement>(null);
     const onCrop = () => {
         const cropper = cropperRef.current?.cropper;
@@ -58,7 +58,7 @@ const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
 
     return (
         <CropperImpl
-            src={imageSrc}
+            src={imgSrc}
             minContainerHeight={150}
             aspectRatio={1}
             guides={false}
@@ -72,7 +72,7 @@ const Cropper = ({ imageSrc, onCropMove }: CropperProps) => {
 
 export default function ImageCropModal({
     open,
-    imageSrc,
+    imgSrc,
     onClose,
     onCrop
 }: ImageCropModalProps) {
@@ -87,7 +87,7 @@ export default function ImageCropModal({
         cropBoxData.current && onCrop(cropBoxData.current, cropRatioRef.current!);
     }
 
-    const content = <Cropper imageSrc={imageSrc} onCropMove={onCropMove} />
+    const content = <Cropper imgSrc={imgSrc} onCropMove={onCropMove} />
 
     const footer = (<div className='flex justify-between gap-4'>
         <Button theme='secondary' className="text-sm px-0 py-0 w-full" onClick={onClose}>Cancel</Button>

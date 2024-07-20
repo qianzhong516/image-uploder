@@ -5,8 +5,14 @@ import ProfileIcon from '@/models/ProfileIcon';
 import sharp from 'sharp';
 import { promisify } from 'util';
 import UserProfile from '@/models/UserProfile';
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import client from '../../client';
+import { getErrorResponse } from '../../utils';
+import { v1 as uuid } from 'uuid';
 
 // profile-icons/[id]
 export async function PUT(
@@ -24,91 +30,61 @@ export async function PUT(
     }
   });
 
-  const inputPath = path.resolve(
-    process.cwd(),
-    `public/uploads/${userId}/${fileId}`
-  );
-
-  const ext = path.extname(fileId);
-  const fileName = path.parse(fileId).name;
-  const match = fileName.match(/(.+)-cropped-(\d)$/);
-  // fileName, fileName-cropped-1, fileName-cropped-2, ...
-  let newTitle = '';
-  if (!match) {
-    newTitle = `${fileName}-cropped-1${ext}`;
-  } else {
-    const versionNum = Number(match[2]) + 1;
-    newTitle = `${match[1]}-cropped-${versionNum}${ext}`;
+  // find the saved path from db
+  const oldIcon = await ProfileIcon.findById(fileId);
+  if (!oldIcon) {
+    return getErrorResponse('Icon is not found.', 400);
   }
 
-  const outputPath = path.resolve(
-    process.cwd(),
-    `public/uploads/${userId}/${newTitle}`
-  );
-
   try {
-    const input = await readFile(inputPath);
-    const instance = sharp(input).extract(cropData);
-    const toFile = promisify(instance.toFile.bind(instance));
-    const croppedFile = (await toFile(outputPath)) as unknown as {
-      size: number;
-    };
+    // download the old file
+    const command = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: oldIcon.path,
+    });
+    const response = await client.send(command);
+    const bytes = await response.Body?.transformToByteArray();
+
+    // crop the file
+    const instance = sharp(bytes).extract(cropData);
+    const buffer = await instance.toBuffer();
+
+    // upload the cropped version
+    const ext = path.extname(oldIcon.title);
+    const key = `${userId}/${uuid()}${ext}`;
+    const uploadCmd = new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: key,
+      Body: buffer,
+    });
+    await client.send(uploadCmd);
+
+    // update DB record
+    await ProfileIcon.findByIdAndUpdate(fileId, {
+      path: key,
+    });
 
     // delete the old file
-    await unlink(inputPath);
-
-    // if the image is what user's primary icon, update the saved path in DB
-    let isPrimaryIcon = false;
-    const icon = await UserProfile.findOne({
-      _id: userId,
+    const deleteCmd = new DeleteObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: oldIcon.path,
     });
-    if (icon) {
-      isPrimaryIcon =
-        icon.profileIcon === `/uploads/${userId}/${fileId}`;
-    }
-    if (isPrimaryIcon) {
-      await UserProfile.findOneAndUpdate(
-        {
-          _id: userId,
-        },
-        {
-          profileIcon: `/uploads/${userId}/${newTitle}`,
-        }
-      );
-    }
-
-    const result = await ProfileIcon.findOneAndUpdate(
-      {
-        title: fileId,
-        uploadedBy: userId,
-      },
-      {
-        title: newTitle,
-        path: `/uploads/${userId}/${newTitle}`,
-        totalSizeInBytes: croppedFile.size,
-      },
-      {
-        new: true,
-      }
-    );
+    await client.send(deleteCmd);
 
     return NextResponse.json(
       {
         message: {
-          profileIcon: result,
-          isPrimaryIconUpdated: isPrimaryIcon,
+          profileIcon: {
+            totalSize: buffer.byteLength,
+            path: key,
+          },
         },
       },
       { status: 200 }
     );
   } catch (err) {
     if (err instanceof Error) {
-      return NextResponse.json(
-        {
-          message: err.message,
-        },
-        { status: 400 }
-      );
+      return getErrorResponse(err.message, 400);
     }
   }
 }
