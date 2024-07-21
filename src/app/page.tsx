@@ -36,7 +36,7 @@ export default function Home() {
   const UploadImageModal = createUploadImageModal();
 
   return (
-    <div className='w-full max-w-[600px] mt-[200px] mx-auto'>
+    <div className='w-full max-w-[600px] mt-[200px] mx-auto p-4'>
       <ProfileBanner
         profileIconSrc={primaryIcon?.path || ''}
         name='Jack Smith'

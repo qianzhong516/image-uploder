@@ -40,7 +40,7 @@ export function ModalImpl({
 }
 
 const Backdrop = ({ children }: { children: React.ReactNode }) =>
-    <div className='fixed inset-0 w-full h-full bg-neutral-950/40 backdrop-blur-sm flex justify-center'>{children}</div>;
+    <div className='fixed inset-0 w-full h-full bg-neutral-950/40 backdrop-blur-sm p-4'>{children}</div>;
 
 export default function Modal({
     open,
