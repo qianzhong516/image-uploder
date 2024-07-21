@@ -103,6 +103,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 }
 
                 axios.post('/api/upload', formData, config).then(res => {
+                    console.log('upload response: ', res);
                     const fileId = res.data.message.id;
                     setImageList(draft => {
                         draft[i] = {
@@ -130,6 +131,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         })
                     }, 2000);
                 }).catch(err => {
+                    console.log('upload err: ', err);
                     let error = '';
                     if (err instanceof AxiosError) {
                         error = err.response?.data.message;
