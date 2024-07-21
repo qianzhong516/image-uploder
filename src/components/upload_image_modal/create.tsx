@@ -130,34 +130,34 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         })
                     }, 2000);
                 }).catch(err => {
-                    console.log(err)
-
+                    let error = '';
                     if (err instanceof AxiosError) {
-                        setImageList(draft => {
-                            let error = err.response?.data.message;
+                        error = err.response?.data.message;
 
-                            if (err.code === AxiosError.ERR_CANCELED) {
-                                error = 'The uploading process has been cancelled';
-                            }
+                        if (err.code === AxiosError.ERR_CANCELED) {
+                            error = 'The uploading process has been cancelled';
+                        }
 
-                            if (err.code === AxiosError.ERR_NETWORK) {
-                                error = 'An error occurred during the upload. Please check your network connection and try again.';
-                            }
-
-                            if (err.status === 413) {
-                                // the payload exceeds the server's limit
-                                error = 'This image is larger than 5MB. Please select a smaller image.';
-                            }
-
-                            draft[i] = {
-                                state: 'error',
-                                title,
-                                totalSize,
-                                onDelete: () => setImageList(draft => draft.filter(d => d.title !== title)),
-                                error
-                            }
-                        })
+                        if (err.code === AxiosError.ERR_NETWORK) {
+                            error = 'An error occurred during the upload. Please check your network connection and try again.';
+                        }
+                    } else {
+                        error = err.message;
+                        // the payload exceeds the server's limit
+                        if (err?.code === '413') {
+                            error = 'This image is larger than 5MB. Please select a smaller image.';
+                        }
                     }
+
+                    setImageList(draft => {
+                        draft[i] = {
+                            state: 'error',
+                            title,
+                            totalSize,
+                            onDelete: () => setImageList(draft => draft.filter(d => d.title !== title)),
+                            error
+                        }
+                    })
                 });
             });
         };
