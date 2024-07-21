@@ -166,18 +166,26 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         }
                     });
                     const icons = res.data.message || [];
-                    setImageList(icons.map(({ _id, title, totalSizeInBytes, path }: ProfileIcons) => ({
-                        state: 'complete',
-                        id: _id,
-                        title,
-                        totalSize: getTotalSize(totalSizeInBytes),
-                        imgSrc: path,
-                        onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
-                            setSelectedIconId(e.target.value),
-                        selected: currentProfileIcon?.path === path,
-                        openCropper,
-                        onDelete: createDeleteImageHandler(_id),
-                    }) as ImageItemCompleteProps));
+                    let selectedIconId = '';
+                    setImageList(icons.map(({ _id, title, totalSizeInBytes, path }: ProfileIcons) => {
+                        const defaultSelected = currentProfileIcon?.path === path;
+                        if (defaultSelected) {
+                            selectedIconId = _id;
+                        }
+                        return {
+                            state: 'complete',
+                            id: _id,
+                            title,
+                            totalSize: getTotalSize(totalSizeInBytes),
+                            imgSrc: path,
+                            onChangeSelection: (e: React.ChangeEvent<HTMLInputElement>) =>
+                                setSelectedIconId(e.target.value),
+                            selected: defaultSelected,
+                            openCropper,
+                            onDelete: createDeleteImageHandler(_id),
+                        } as ImageItemCompleteProps
+                    }));
+                    setSelectedIconId(selectedIconId);
                 } catch (_) {
                     setHasFetchError(true);
                 }
@@ -215,7 +223,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         isOpen={isCropperOpen}
                         imgId={cropperImgId}
                         imgSrc={cropperImage.imgSrc}
-                        updatePrimaryIcon={cropperImage.id === currentProfileIcon?.path ? updatePrimaryIcon : undefined}
+                        updatePrimaryIcon={cropperImage.id === currentProfileIcon?._id ? updatePrimaryIcon : undefined}
                         updateImage={handleUpdateImage}
                         closeModal={closeCropper} />}
             </>

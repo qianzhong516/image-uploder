@@ -1,10 +1,7 @@
-import { unlink, readFile } from 'fs/promises';
 import path from 'path';
 import { NextRequest, NextResponse } from 'next/server';
 import ProfileIcon from '@/models/ProfileIcon';
 import sharp from 'sharp';
-import { promisify } from 'util';
-import UserProfile from '@/models/UserProfile';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -62,6 +59,7 @@ export async function PUT(
     // update DB record
     await ProfileIcon.findByIdAndUpdate(fileId, {
       path: key,
+      totalSizeInBytes: buffer.byteLength,
     });
 
     // delete the old file
@@ -120,12 +118,7 @@ export async function DELETE(
     );
   } catch (err) {
     if (err instanceof Error) {
-      return NextResponse.json(
-        {
-          message: err.message,
-        },
-        { status: 400 }
-      );
+      return getErrorResponse(err.message, 400);
     }
   }
 }

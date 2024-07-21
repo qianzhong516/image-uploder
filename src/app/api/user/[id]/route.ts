@@ -2,6 +2,7 @@ import dbConnect from '@/lib/dbconnect';
 import { NextRequest, NextResponse } from 'next/server';
 import ProfileIcon from '@/models/ProfileIcon';
 import UserProfile from '@/models/UserProfile';
+import { getErrorResponse } from '../../utils';
 
 export async function GET(
   req: NextRequest,
@@ -44,12 +45,7 @@ export async function PUT(
   const { iconId } = await req.json();
 
   if (!iconId) {
-    return NextResponse.json(
-      {
-        message: 'Icon is not specified.',
-      },
-      { status: 400 }
-    );
+    return getErrorResponse('Icon is not specified.', 400);
   }
 
   try {
@@ -58,12 +54,7 @@ export async function PUT(
     const icon = await ProfileIcon.findById(iconId);
 
     if (!icon) {
-      return NextResponse.json(
-        {
-          message: 'File does not exist.',
-        },
-        { status: 400 }
-      );
+      return getErrorResponse('File does not exist.', 400);
     }
 
     await UserProfile.findOneAndUpdate(
@@ -86,12 +77,7 @@ export async function PUT(
     );
   } catch (err) {
     if (err instanceof Error) {
-      return NextResponse.json(
-        {
-          message: err.message,
-        },
-        { status: 400 }
-      );
+      return getErrorResponse(err.message, 400);
     }
   }
 }
