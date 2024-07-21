@@ -103,7 +103,6 @@ export const View: Story = {
                     const item = updatedList[index];
                     updatedList.splice(index, 1, {
                         state: 'error',
-                        id: item.title,
                         title: item.title,
                         totalSize: item.totalSize,
                         error,

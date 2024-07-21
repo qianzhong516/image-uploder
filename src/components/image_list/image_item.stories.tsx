@@ -20,6 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 export const InitialState: Story = {
     args: {
+        id: '1',
         state: 'complete',
         imgSrc: '/avatar-image-item.png',
         selected: false,
@@ -40,6 +41,7 @@ export const LoadingState: Story = {
 
 export const LoadSuccessState: Story = {
     args: {
+        id: '2',
         state: 'load-success',
         imgSrc: '/avatar-image-item.png',
         onDelete: fn()

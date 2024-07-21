@@ -67,7 +67,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
 
             files.forEach((file, index) => {
                 const i = imageList.length + index;
-                const title = files[index].name; // TODO: deal with duplicate file name
+                const title = files[index].name;
                 const imgSrc = sources[index] as string;
                 const totalSize = getTotalSize(file.size);
 

@@ -12,7 +12,7 @@ const meta = {
     tags: ['!autodocs'],
     args: {
         open: true,
-        imageSrc: '/avatar-john.png',
+        imgSrc: '/avatar-john.png',
         onClose: fn(),
         onCrop: fn()
     },
@@ -27,7 +27,5 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const View: Story = {
-    args: {
-
-    },
+    args: {},
 }
