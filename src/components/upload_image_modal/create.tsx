@@ -103,7 +103,6 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                 }
 
                 axios.post('/api/upload', formData, config).then(res => {
-                    console.log('upload response: ', res);
                     const fileId = res.data.message.id;
                     setImageList(draft => {
                         draft[i] = {
@@ -131,26 +130,19 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                         })
                     }, 2000);
                 }).catch(err => {
-                    console.log('upload err: ', err);
                     let error = '';
                     if (err instanceof AxiosError) {
                         error = err.response?.data.message;
 
                         if (err.code === AxiosError.ERR_CANCELED) {
                             error = 'The uploading process has been cancelled';
-                        }
-
-                        if (err.code === AxiosError.ERR_NETWORK) {
+                        } else if (err.code === AxiosError.ERR_NETWORK) {
                             error = 'An error occurred during the upload. Please check your network connection and try again.';
-                        }
-                    } else {
-                        error = err.message;
-                        // the payload exceeds the server's limit
-                        if (err?.code === '413') {
+                        } else if (err.response?.status === 413) {
+                            // the payload exceeds the server's limit
                             error = 'This image is larger than 5MB. Please select a smaller image.';
                         }
                     }
-
                     setImageList(draft => {
                         draft[i] = {
                             state: 'error',
