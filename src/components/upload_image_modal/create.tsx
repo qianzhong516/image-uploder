@@ -144,6 +144,11 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                                 error = 'An error occurred during the upload. Please check your network connection and try again.';
                             }
 
+                            if (err.status === 413) {
+                                // the payload exceeds the server's limit
+                                error = 'This image is larger than 5MB. Please select a smaller image.';
+                            }
+
                             draft[i] = {
                                 state: 'error',
                                 title,
