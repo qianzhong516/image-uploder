@@ -97,7 +97,7 @@ export default function ImageCropModal({
     return (
         <Modal
             ID='imageCrop'
-            className='max-w-[300px] m-auto mt-[200px]'
+            className='max-w-[300px] m-auto sm:mt-[200px]'
             open={open}
             title='Crop your picture'
             content={content}
