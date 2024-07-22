@@ -72,7 +72,7 @@ export default function UploadImageModal({
         onClose={onClose}
         title='Upload image(s)'
         subtitle='You may upload up to 5 images'
-        className='max-w-[600px] w-full m-auto mt-[200px]'
+        className='max-w-[600px] max-h-[600px] w-full m-auto sm:mt-[200px] overflow-y-auto'
         footer={footer}
         content={content}>
     </Modal>
