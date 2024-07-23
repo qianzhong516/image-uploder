@@ -25,7 +25,7 @@ export function ModalImpl({
     onClose,
 }: ModalProps) {
     return (
-        <div className={twMerge('flex flex-col gap-6 p-4 shadow-md bg-white rounded-md', className)}>
+        <div className={twMerge('flex flex-col gap-6 p-4 pb-0 shadow-md bg-white rounded-md', className)}>
             <div className='flex justify-between w-full items-center'>
                 <div className='flex flex-col gap'>
                     <h1 className="text-lg">{title}</h1>
@@ -34,13 +34,15 @@ export function ModalImpl({
                 <Button theme='tertiary' onClick={onClose}><CloseIcon /></Button>
             </div>
             {content}
-            {footer}
+            <div className='sticky bottom-0 bg-white w-full pb-4'>
+                {footer}
+            </div>
         </div>
     );
 }
 
 const Backdrop = ({ children }: { children: React.ReactNode }) =>
-    <div className='fixed inset-0 w-full h-full bg-neutral-950/40 backdrop-blur-sm p-4'>{children}</div>;
+    <div className='fixed inset-0 sm:flex sm:justify-center sm:items-center w-full h-svh bg-neutral-950/40 backdrop-blur-sm p-4'>{children}</div>;
 
 export default function Modal({
     open,
