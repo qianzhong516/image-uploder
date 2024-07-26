@@ -2,7 +2,7 @@
 
 import ProfileBanner from '@/components/profile_banner/profile_banner';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from '@/axios';
 import { createUploadImageModal } from '@/components/upload_image_modal/create';
 import { ProfileIcons } from '@/models/ProfileIcon';
@@ -10,12 +10,15 @@ import { ProfileIcons } from '@/models/ProfileIcon';
 // TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
 
+// TODO: 
+// 1. implement stacked modals
+// 2. add isTopLayer and clickOutside hooks
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [primaryIcon, setPrimaryIcon] = useState<ProfileIcons>();
 
-  const handleUpdatePicture = useCallback(() => setIsOpen(true), []);
-  const closeModal = useCallback(() => setIsOpen(false), []);
+  const handleUpdatePicture = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
 
   useEffect(() => {
     async function displayUserProfileIcon() {

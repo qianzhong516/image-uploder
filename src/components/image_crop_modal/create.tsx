@@ -4,6 +4,7 @@ import CropperTypes from 'cropperjs';
 import { ImageItemCompleteProps } from '../image_list/image_item';
 import { ProfileIcons } from '@/models/ProfileIcon';
 import { getImageSource, getTotalSize } from '@/utils';
+import { useEvent } from '@/hooks/useEvent';
 
 type CreateImageCropModalProps = {
     imgId: string,
@@ -26,7 +27,7 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
         updateImage,
         closeModal
     }: CreateImageCropModalProps) => {
-        const onCrop = async (props: CropperTypes.CropBoxData, cropRatio: number) => {
+        const onCrop = useEvent(async (props: CropperTypes.CropBoxData, cropRatio: number) => {
             try {
                 const res = await axios.put(`api/profile-icons/${imgId}`, {
                     uploadedBy: CURRENT_USER_ID,
@@ -47,7 +48,7 @@ export const createImageCropModal = (): React.FC<CreateImageCropModalProps> => {
             } finally {
                 closeModal();
             }
-        }
+        });
 
         let src = imgSrc;
         const isDataURL = (url: string) => /^data:image\/(jpeg|jpg|png);base64,/.test(url);

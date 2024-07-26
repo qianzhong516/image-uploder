@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from '@/axios';
 import { createImageCropModal } from '@/components/image_crop_modal/create';
 import { ImageItemCompleteProps } from '../image_list/image_item';
+import { useEvent } from '@/hooks/useEvent';
 
 // TODO: remove this later
 const CURRENT_USER_ID = '66882ac39085ad43fb32ce05';
@@ -23,12 +24,19 @@ type CreateUploadImageModalProps = {
 export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> => {
     const ImageCropModal = createImageCropModal();
 
-    const Component = ({ isOpen, currentProfileIcon, updatePrimaryIcon, closeModal }: CreateUploadImageModalProps) => {
+    const Component = ({
+        isOpen,
+        currentProfileIcon,
+        updatePrimaryIcon: _updatePrimaryIcon,
+        closeModal: _closeModal
+    }: CreateUploadImageModalProps) => {
         const [imageList, setImageList] = useImmer<ImageListProps>([]);
         const [hasFetchError, setHasFetchError] = useState(false);
         const [selectedIconId, setSelectedIconId] = useState('');
         const [isCropperOpen, setIsCropperOpen] = useState(false);
         const [cropperImgId, setCropperImgId] = useState('');
+        const closeModal = useEvent(_closeModal);
+        const updatePrimaryIcon = useEvent(_updatePrimaryIcon);
 
         const handleOnConfirm = useCallback(async () => {
             closeModal();
@@ -39,28 +47,28 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             if (icon) {
                 updatePrimaryIcon(icon);
             }
-        }, [closeModal, selectedIconId, updatePrimaryIcon]);
+        }, [selectedIconId]);
 
-        const createDeleteImageHandler = useCallback((id: string) => async () => {
+        const createDeleteImageHandler = useEvent((id: string) => async () => {
             setImageList(draft => draft.filter(d => (d.state === 'complete' || d.state === 'load-success') && d.id !== id));
             await axios.delete(`api/profile-icons/${id}`).catch(err => {
                 // TODO: show the error in a toast
                 console.log(err);
             });
-        }, [setImageList]);
+        });
 
-        const createCancelUploadHandler = useCallback((fileName: string, controller: AbortController) => () => {
+        const createCancelUploadHandler = useEvent((fileName: string, controller: AbortController) => () => {
             setImageList(draft => draft.filter(d => d.title !== fileName));
             controller.abort('Cancel upload.');
-        }, [setImageList]);
+        });
 
-        const openCropper = useCallback((id: string) => {
+        const openCropper = useEvent((id: string) => {
             setIsCropperOpen(true);
             setCropperImgId(id);
-        }, []);
-        const closeCropper = useCallback(() => setIsCropperOpen(false), []);
+        });
+        const closeCropper = useEvent(() => setIsCropperOpen(false));
 
-        const handleUploadImage = async (files: File[]) => {
+        const handleUploadImage = useEvent(async (files: File[]) => {
 
             // read image baseUrls in parallel
             const sources = await getImgSrc(files);
@@ -154,7 +162,7 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
                     })
                 });
             });
-        };
+        });
 
         useEffect(() => {
             async function displayUploadedIcons() {
@@ -193,18 +201,18 @@ export const createUploadImageModal = (): React.FC<CreateUploadImageModalProps> 
             if (isOpen) {
                 displayUploadedIcons();
             }
-        }, [createDeleteImageHandler, isOpen, currentProfileIcon?.path, openCropper, setImageList]);
+        }, [isOpen, currentProfileIcon?.path]);
 
         const index = imageList.findIndex(img => img.state === 'complete' && img.id === cropperImgId);
         const cropperImage = imageList[index];
-        const handleUpdateImage = useCallback((updatedImage: Pick<ImageItemCompleteProps, 'totalSize' | 'imgSrc'>) => {
+        const handleUpdateImage = useEvent((updatedImage: Pick<ImageItemCompleteProps, 'totalSize' | 'imgSrc'>) => {
             setImageList(draft => {
                 draft[index] = {
                     ...draft[index],
                     ...updatedImage
                 }
             });
-        }, [index, setImageList]);
+        });
 
         return (
             <>
