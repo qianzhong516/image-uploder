@@ -67,7 +67,6 @@ export default function UploadImageModal({
     }
 
     return <Modal
-        ID='uploadImage'
         open={open}
         onClose={onClose}
         title='Upload image(s)'
