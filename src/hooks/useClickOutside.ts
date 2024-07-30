@@ -24,7 +24,6 @@ export default function useClickOutside(
         }
       }
 
-      console.log('triggered', containers);
       callback(e);
     },
     [containers]

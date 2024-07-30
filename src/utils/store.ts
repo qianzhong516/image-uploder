@@ -7,7 +7,10 @@ type Store<StateDefinition, ActionKey> = {
 };
 
 type Actions<StateDefinition, ActionKeys extends string> = {
-  [P in ActionKeys]: (...args: any[]) => StateDefinition;
+  [P in ActionKeys]: (
+    this: StateDefinition,
+    ...args: any[]
+  ) => StateDefinition;
 };
 
 export function createStore<

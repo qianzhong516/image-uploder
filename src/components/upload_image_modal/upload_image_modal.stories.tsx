@@ -33,7 +33,6 @@ export const View: Story = {
 
         const uploadFiles = async (files: File[]) => {
             const sources = await getImgSrc(files);
-            console.log({ sources })
             const imagesInUpload: ImageListProps = files.map((file, i) => {
                 return {
                     id: file.name,
@@ -57,7 +56,6 @@ export const View: Story = {
                         item.progress = Math.round(fileProgress.loaded / fileProgress.totalSize * 100);
                     }
                 })
-                console.log(updatedList)
                 updateArgs({ imageList: updatedList });
             });
 

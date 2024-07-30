@@ -10,10 +10,10 @@ enum ActionTypes {
 // create stores that share data across multiple components
 const layerStores = new StoreFactory(() =>
   createStore(() => [] as string[], {
-    [ActionTypes.ADD](this: string[], id: string) {
+    [ActionTypes.ADD](id: string) {
       return Array.from(new Set(this)).concat([id]);
     },
-    [ActionTypes.REMOVE](this: string[], id: string) {
+    [ActionTypes.REMOVE](id: string) {
       const index = this.indexOf(id);
       if (index < 0) {
         return this;
